@@ -1,0 +1,284 @@
+apiVersion: kubedb.com/v1alpha2
+kind: MongoDB
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"kubedb.com/v1alpha2","kind":"MongoDB","metadata":{"annotations":{},"name":"mongo","namespace":"db"},"spec":{"allowedSchemas":{"namespaces":{"from":"Selector","selector":{"matchLabels":{"kubernetes.io/metadata.name":"dev"}}}},"arbiter":{"replicas":2},"shardTopology":{"configServer":{"podTemplate":{"spec":{"resources":{"requests":{"cpu":"100m","memory":"100Mi"}}}},"replicas":3,"storage":{"resources":{"requests":{"storage":"100Mi"}},"storageClassName":"standard"}},"mongos":{"podTemplate":{"spec":{"resources":{"requests":{"cpu":"100m","memory":"100Mi"}}}},"replicas":2},"shard":{"podTemplate":{"spec":{"resources":{"requests":{"cpu":"100m","memory":"100Mi"}}}},"replicas":3,"shards":2,"storage":{"resources":{"requests":{"storage":"100Mi"}},"storageClassName":"standard"}}},"version":"4.4.6"}}
+  creationTimestamp: "2022-02-22T04:09:44Z"
+  finalizers:
+  - kubedb.com
+  generation: 3
+  name: mongo
+  namespace: db
+  resourceVersion: "392242"
+  uid: 933ef88a-4706-41a3-a3dd-641a6044720c
+spec:
+  allowedSchemas:
+    namespaces:
+      from: Selector
+      selector:
+        matchLabels:
+          kubernetes.io/metadata.name: dev
+  arbiter:
+    podTemplate:
+      controller: {}
+      metadata: {}
+      spec:
+        resources: {}
+    replicas: 2
+  authSecret:
+    name: mongo-auth
+  clusterAuthMode: keyFile
+  coordinator:
+    resources: {}
+  keyFileSecret:
+    name: mongo-key
+  shardTopology:
+    configServer:
+      podTemplate:
+        controller: {}
+        metadata: {}
+        spec:
+          affinity:
+            podAntiAffinity:
+              preferredDuringSchedulingIgnoredDuringExecution:
+              - podAffinityTerm:
+                  labelSelector:
+                    matchLabels:
+                      app.kubernetes.io/instance: mongo
+                      app.kubernetes.io/managed-by: kubedb.com
+                      app.kubernetes.io/name: mongodbs.kubedb.com
+                      mongodb.kubedb.com/node.config: mongo-configsvr
+                  namespaces:
+                  - db
+                  topologyKey: kubernetes.io/hostname
+                weight: 100
+              - podAffinityTerm:
+                  labelSelector:
+                    matchLabels:
+                      app.kubernetes.io/instance: mongo
+                      app.kubernetes.io/managed-by: kubedb.com
+                      app.kubernetes.io/name: mongodbs.kubedb.com
+                      mongodb.kubedb.com/node.config: mongo-configsvr
+                  namespaces:
+                  - db
+                  topologyKey: failure-domain.beta.kubernetes.io/zone
+                weight: 50
+          livenessProbe:
+            exec:
+              command:
+              - bash
+              - -c
+              - "set -x; if [[ $(mongo admin --host=localhost  --username=$MONGO_INITDB_ROOT_USERNAME
+                --password=$MONGO_INITDB_ROOT_PASSWORD --authenticationDatabase=admin
+                --quiet --eval \"db.adminCommand('ping').ok\" ) -eq \"1\" ]]; then
+                \n          exit 0\n        fi\n        exit 1"
+            failureThreshold: 3
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+          readinessProbe:
+            exec:
+              command:
+              - bash
+              - -c
+              - "set -x; if [[ $(mongo admin --host=localhost  --username=$MONGO_INITDB_ROOT_USERNAME
+                --password=$MONGO_INITDB_ROOT_PASSWORD --authenticationDatabase=admin
+                --quiet --eval \"db.adminCommand('ping').ok\" ) -eq \"1\" ]]; then
+                \n          exit 0\n        fi\n        exit 1"
+            failureThreshold: 3
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              memory: 100Mi
+            requests:
+              cpu: 100m
+              memory: 100Mi
+          serviceAccountName: mongo
+      replicas: 3
+      storage:
+        resources:
+          requests:
+            storage: 100Mi
+        storageClassName: standard
+    mongos:
+      podTemplate:
+        controller: {}
+        metadata: {}
+        spec:
+          affinity:
+            podAntiAffinity:
+              preferredDuringSchedulingIgnoredDuringExecution:
+              - podAffinityTerm:
+                  labelSelector:
+                    matchLabels:
+                      app.kubernetes.io/instance: mongo
+                      app.kubernetes.io/managed-by: kubedb.com
+                      app.kubernetes.io/name: mongodbs.kubedb.com
+                      mongodb.kubedb.com/node.mongos: mongo-mongos
+                  namespaces:
+                  - db
+                  topologyKey: kubernetes.io/hostname
+                weight: 100
+              - podAffinityTerm:
+                  labelSelector:
+                    matchLabels:
+                      app.kubernetes.io/instance: mongo
+                      app.kubernetes.io/managed-by: kubedb.com
+                      app.kubernetes.io/name: mongodbs.kubedb.com
+                      mongodb.kubedb.com/node.mongos: mongo-mongos
+                  namespaces:
+                  - db
+                  topologyKey: failure-domain.beta.kubernetes.io/zone
+                weight: 50
+          lifecycle:
+            preStop:
+              exec:
+                command:
+                - bash
+                - -c
+                - 'mongo admin --username=$MONGO_INITDB_ROOT_USERNAME --password=$MONGO_INITDB_ROOT_PASSWORD
+                  --quiet --eval "db.adminCommand({ shutdown: 1 })" || true'
+          livenessProbe:
+            exec:
+              command:
+              - bash
+              - -c
+              - "set -x; if [[ $(mongo admin --host=localhost  --username=$MONGO_INITDB_ROOT_USERNAME
+                --password=$MONGO_INITDB_ROOT_PASSWORD --authenticationDatabase=admin
+                --quiet --eval \"db.adminCommand('ping').ok\" ) -eq \"1\" ]]; then
+                \n          exit 0\n        fi\n        exit 1"
+            failureThreshold: 3
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+          readinessProbe:
+            exec:
+              command:
+              - bash
+              - -c
+              - "set -x; if [[ $(mongo admin --host=localhost  --username=$MONGO_INITDB_ROOT_USERNAME
+                --password=$MONGO_INITDB_ROOT_PASSWORD --authenticationDatabase=admin
+                --quiet --eval \"db.adminCommand('ping').ok\" ) -eq \"1\" ]]; then
+                \n          exit 0\n        fi\n        exit 1"
+            failureThreshold: 3
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              memory: 100Mi
+            requests:
+              cpu: 100m
+              memory: 100Mi
+          serviceAccountName: mongo
+      replicas: 2
+    shard:
+      podTemplate:
+        controller: {}
+        metadata: {}
+        spec:
+          affinity:
+            podAntiAffinity:
+              preferredDuringSchedulingIgnoredDuringExecution:
+              - podAffinityTerm:
+                  labelSelector:
+                    matchLabels:
+                      app.kubernetes.io/instance: mongo
+                      app.kubernetes.io/managed-by: kubedb.com
+                      app.kubernetes.io/name: mongodbs.kubedb.com
+                      mongodb.kubedb.com/node.shard: mongo-shard${SHARD_INDEX}
+                  namespaces:
+                  - db
+                  topologyKey: kubernetes.io/hostname
+                weight: 100
+              - podAffinityTerm:
+                  labelSelector:
+                    matchLabels:
+                      app.kubernetes.io/instance: mongo
+                      app.kubernetes.io/managed-by: kubedb.com
+                      app.kubernetes.io/name: mongodbs.kubedb.com
+                      mongodb.kubedb.com/node.shard: mongo-shard${SHARD_INDEX}
+                  namespaces:
+                  - db
+                  topologyKey: failure-domain.beta.kubernetes.io/zone
+                weight: 50
+          livenessProbe:
+            exec:
+              command:
+              - bash
+              - -c
+              - "set -x; if [[ $(mongo admin --host=localhost  --username=$MONGO_INITDB_ROOT_USERNAME
+                --password=$MONGO_INITDB_ROOT_PASSWORD --authenticationDatabase=admin
+                --quiet --eval \"db.adminCommand('ping').ok\" ) -eq \"1\" ]]; then
+                \n          exit 0\n        fi\n        exit 1"
+            failureThreshold: 3
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+          readinessProbe:
+            exec:
+              command:
+              - bash
+              - -c
+              - "set -x; if [[ $(mongo admin --host=localhost  --username=$MONGO_INITDB_ROOT_USERNAME
+                --password=$MONGO_INITDB_ROOT_PASSWORD --authenticationDatabase=admin
+                --quiet --eval \"db.adminCommand('ping').ok\" ) -eq \"1\" ]]; then
+                \n          exit 0\n        fi\n        exit 1"
+            failureThreshold: 3
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              memory: 100Mi
+            requests:
+              cpu: 100m
+              memory: 100Mi
+          serviceAccountName: mongo
+      replicas: 3
+      shards: 2
+      storage:
+        resources:
+          requests:
+            storage: 100Mi
+        storageClassName: standard
+  sslMode: disabled
+  storageEngine: wiredTiger
+  storageType: Durable
+  terminationPolicy: Delete
+  version: 4.4.6
+status:
+  conditions:
+  - lastTransitionTime: "2022-02-22T04:09:44Z"
+    message: 'The KubeDB operator has started the provisioning of MongoDB: db/mongo'
+    reason: DatabaseProvisioningStartedSuccessfully
+    status: "True"
+    type: ProvisioningStarted
+  - lastTransitionTime: "2022-02-22T04:11:51Z"
+    message: All desired replicas are ready.
+    reason: AllReplicasReady
+    status: "True"
+    type: ReplicaReady
+  - lastTransitionTime: "2022-02-22T04:11:45Z"
+    message: 'The MongoDB: db/mongo is accepting client requests.'
+    observedGeneration: 3
+    reason: DatabaseAcceptingConnectionRequest
+    status: "True"
+    type: AcceptingConnection
+  - lastTransitionTime: "2022-02-22T04:11:45Z"
+    message: 'The MongoDB: db/mongo is ready.'
+    observedGeneration: 3
+    reason: ReadinessCheckSucceeded
+    status: "True"
+    type: Ready
+  - lastTransitionTime: "2022-02-22T04:11:51Z"
+    message: 'The MongoDB: db/mongo is successfully provisioned.'
+    observedGeneration: 3
+    reason: DatabaseSuccessfullyProvisioned
+    status: "True"
+    type: Provisioned
+  observedGeneration: 3
+  phase: Ready

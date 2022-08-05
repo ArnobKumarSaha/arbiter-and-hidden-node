@@ -1,0 +1,46 @@
+apiVersion: ops.kubedb.com/v1alpha1
+kind: MongoDBOpsRequest
+metadata:
+  name: db-scale
+  namespace: db
+spec:
+  type: VerticalScaling
+  databaseRef:
+    name: mongodb
+  verticalScaling:
+    replicaSet:
+      requests:
+        memory: "420Mi"
+        cpu: "0.55"
+      limits:
+        memory: "1.1Gi"
+        cpu: "0.56"
+    arbiter:
+      requests:
+        memory: "421Mi"
+        cpu: "0.57"
+      limits:
+        memory: "1100Mi"
+        cpu: "0.8"
+    # shard:
+    #   requests:
+    #     memory: "422Mi"
+    #     cpu: "0.58"
+    #   limits:
+    #     memory: "1100Mi"
+    #     cpu: "0.8"
+    # configServer:
+    #   requests:
+    #     memory: "423Mi"
+    #     cpu: "0.59"
+    #   limits:
+    #     memory: "110Mi"
+    #     cpu: "0.8"
+    # mongos:
+    #   requests:
+    #     memory: "424Mi"
+    #     cpu: "0.6"
+    #   limits:
+    #     memory: "110Mi"
+    #     cpu: "0.8"
+

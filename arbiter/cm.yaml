@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mg-init
+  namespace: db
+data:
+  init.js: |-
+    db = db.getSiblingDB('hello');
+    db.people.insert({"firstname": "kubernetes", "lastname": "database" });

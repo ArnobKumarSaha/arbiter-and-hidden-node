@@ -1,0 +1,148 @@
+apiVersion: kubedb.com/v1alpha2
+kind: MongoDB
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"kubedb.com/v1alpha2","kind":"MongoDB","metadata":{"annotations":{},"name":"mongodb","namespace":"db"},"spec":{"allowedSchemas":{"namespaces":{"from":"Selector","selector":{"matchExpressions":[{"key":"kubernetes.io/metadata.name","operator":"In","values":["dev"]}]}},"selector":{"matchLabels":{"schema.kubedb.com":"mongo"}}},"arbiter":{"replicas":2},"podTemplate":{"spec":{"resources":{"requests":{"cpu":"100m","memory":"100Mi"}}}},"replicaSet":{"name":"replicaset"},"replicas":3,"storage":{"accessModes":["ReadWriteOnce"],"resources":{"requests":{"storage":"100Mi"}},"storageClassName":"standard"},"storageType":"Durable","version":"4.4.6"}}
+  creationTimestamp: "2022-02-18T12:00:43Z"
+  finalizers:
+  - kubedb.com
+  generation: 3
+  name: mongodb
+  namespace: db
+  resourceVersion: "384786"
+  uid: 10969c71-32c8-4d91-90da-bc2ebcb571a2
+spec:
+  allowedSchemas:
+    namespaces:
+      from: Selector
+      selector:
+        matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+          - dev
+    selector:
+      matchLabels:
+        schema.kubedb.com: mongo
+  arbiter:
+    podTemplate:
+      controller: {}
+      metadata: {}
+      spec:
+        resources: {}
+    replicas: 2
+  authSecret:
+    name: mongodb-auth
+  clusterAuthMode: keyFile
+  coordinator:
+    resources: {}
+  keyFileSecret:
+    name: mongodb-key
+  podTemplate:
+    controller: {}
+    metadata: {}
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app.kubernetes.io/instance: mongodb
+                  app.kubernetes.io/managed-by: kubedb.com
+                  app.kubernetes.io/name: mongodbs.kubedb.com
+              namespaces:
+              - db
+              topologyKey: kubernetes.io/hostname
+            weight: 100
+          - podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app.kubernetes.io/instance: mongodb
+                  app.kubernetes.io/managed-by: kubedb.com
+                  app.kubernetes.io/name: mongodbs.kubedb.com
+              namespaces:
+              - db
+              topologyKey: failure-domain.beta.kubernetes.io/zone
+            weight: 50
+      livenessProbe:
+        exec:
+          command:
+          - bash
+          - -c
+          - "set -x; if [[ $(mongo admin --host=localhost  --username=$MONGO_INITDB_ROOT_USERNAME
+            --password=$MONGO_INITDB_ROOT_PASSWORD --authenticationDatabase=admin
+            --quiet --eval \"db.adminCommand('ping').ok\" ) -eq \"1\" ]]; then \n
+            \         exit 0\n        fi\n        exit 1"
+        failureThreshold: 3
+        periodSeconds: 10
+        successThreshold: 1
+        timeoutSeconds: 5
+      readinessProbe:
+        exec:
+          command:
+          - bash
+          - -c
+          - "set -x; if [[ $(mongo admin --host=localhost  --username=$MONGO_INITDB_ROOT_USERNAME
+            --password=$MONGO_INITDB_ROOT_PASSWORD --authenticationDatabase=admin
+            --quiet --eval \"db.adminCommand('ping').ok\" ) -eq \"1\" ]]; then \n
+            \         exit 0\n        fi\n        exit 1"
+        failureThreshold: 3
+        periodSeconds: 10
+        successThreshold: 1
+        timeoutSeconds: 1
+      resources:
+        limits:
+          memory: 100Mi
+        requests:
+          cpu: 100m
+          memory: 100Mi
+      serviceAccountName: mongodb
+  replicaSet:
+    name: replicaset
+  replicas: 3
+  sslMode: disabled
+  storage:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: 100Mi
+    storageClassName: standard
+  storageEngine: wiredTiger
+  storageType: Durable
+  terminationPolicy: Delete
+  version: 4.4.6
+status:
+  conditions:
+  - lastTransitionTime: "2022-02-18T12:00:43Z"
+    message: 'The KubeDB operator has started the provisioning of MongoDB: db/mongodb'
+    reason: DatabaseProvisioningStartedSuccessfully
+    status: "True"
+    type: ProvisioningStarted
+  - lastTransitionTime: "2022-02-18T12:01:59Z"
+    message: All desired replicas are ready.
+    reason: AllReplicasReady
+    status: "True"
+    type: ReplicaReady
+  - lastTransitionTime: "2022-02-18T12:01:08Z"
+    message: 'The MongoDB: db/mongodb is accepting client requests.'
+    observedGeneration: 3
+    reason: DatabaseAcceptingConnectionRequest
+    status: "True"
+    type: AcceptingConnection
+  - lastTransitionTime: "2022-02-18T12:01:08Z"
+    message: 'The MongoDB: db/mongodb is ready.'
+    observedGeneration: 3
+    reason: ReadinessCheckSucceeded
+    status: "True"
+    type: Ready
+  - lastTransitionTime: "2022-02-18T12:01:59Z"
+    message: 'The MongoDB: db/mongodb is successfully provisioned.'
+    observedGeneration: 3
+    reason: DatabaseSuccessfullyProvisioned
+    status: "True"
+    type: Provisioned
+  observedGeneration: 3
+  phase: Ready

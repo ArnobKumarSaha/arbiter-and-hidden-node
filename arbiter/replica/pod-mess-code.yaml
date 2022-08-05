@@ -1,0 +1,335 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: "2022-02-15T08:37:02Z"
+  generateName: mongodb-
+  labels:
+    app.kubernetes.io/component: database
+    app.kubernetes.io/instance: mongodb
+    app.kubernetes.io/managed-by: kubedb.com
+    app.kubernetes.io/name: mongodbs.kubedb.com
+    controller-revision-hash: mongodb-5c7bc6788d
+    kubedb.com/role: primary
+    statefulset.kubernetes.io/pod-name: mongodb-0
+  name: mongodb-0
+  namespace: db
+  ownerReferences:
+  - apiVersion: apps/v1
+    blockOwnerDeletion: true
+    controller: true
+    kind: StatefulSet
+    name: mongodb
+    uid: 68254b5d-3515-4928-b6f9-cccb548b536c
+  resourceVersion: "111974"
+  uid: 57900347-de90-4021-a094-79ad6743eb1b
+spec:
+  affinity:
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+      - podAffinityTerm:
+          labelSelector:
+            matchLabels:
+              app.kubernetes.io/instance: mongodb
+              app.kubernetes.io/managed-by: kubedb.com
+              app.kubernetes.io/name: mongodbs.kubedb.com
+          namespaces:
+          - db
+          topologyKey: kubernetes.io/hostname
+        weight: 100
+      - podAffinityTerm:
+          labelSelector:
+            matchLabels:
+              app.kubernetes.io/instance: mongodb
+              app.kubernetes.io/managed-by: kubedb.com
+              app.kubernetes.io/name: mongodbs.kubedb.com
+          namespaces:
+          - db
+          topologyKey: failure-domain.beta.kubernetes.io/zone
+        weight: 50
+  containers:
+  - args:
+    - --dbpath=/data/db
+    - --auth
+    - --bind_ip_all
+    - --port=27017
+    - --ipv6
+    - --tlsMode=disabled
+    - --replSet=replicaset
+    - --keyFile=/data/configdb/key.txt
+    - --clusterAuthMode=keyFile
+    command:
+    - mongod
+    env:
+    - name: POD_NAMESPACE
+      valueFrom:
+        fieldRef:
+          apiVersion: v1
+          fieldPath: metadata.namespace
+    - name: REPLICA_SET
+      value: replicaset
+    - name: AUTH
+      value: "true"
+    - name: SSL_MODE
+      value: disabled
+    - name: CLUSTER_AUTH_MODE
+      value: keyFile
+    - name: MONGO_INITDB_ROOT_USERNAME
+      valueFrom:
+        secretKeyRef:
+          key: username
+          name: mongodb-auth
+    - name: MONGO_INITDB_ROOT_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          key: password
+          name: mongodb-auth
+    - name: POD_NAME
+      valueFrom:
+        fieldRef:
+          apiVersion: v1
+          fieldPath: metadata.name
+    image: mongo:4.4.6
+    imagePullPolicy: IfNotPresent
+    lifecycle:
+      postStart:
+        exec:
+          command:
+          - /bin/bash
+          - -c
+          - /init-scripts/peer-finder -on-start=/init-scripts/replicaset.sh -service=mongodb-pods
+    livenessProbe:
+      exec:
+        command:
+        - bash
+        - -c
+        - "set -x; if [[ $(mongo admin --host=localhost  --username=$MONGO_INITDB_ROOT_USERNAME
+          --password=$MONGO_INITDB_ROOT_PASSWORD --authenticationDatabase=admin --quiet
+          --eval \"db.adminCommand('ping').ok\" ) -eq \"1\" ]]; then \n          exit
+          0\n        fi\n        exit 1"
+      failureThreshold: 3
+      periodSeconds: 10
+      successThreshold: 1
+      timeoutSeconds: 5
+    name: mongodb
+    ports:
+    - containerPort: 27017
+      name: db
+      protocol: TCP
+    readinessProbe:
+      exec:
+        command:
+        - bash
+        - -c
+        - "set -x; if [[ $(mongo admin --host=localhost  --username=$MONGO_INITDB_ROOT_USERNAME
+          --password=$MONGO_INITDB_ROOT_PASSWORD --authenticationDatabase=admin --quiet
+          --eval \"db.adminCommand('ping').ok\" ) -eq \"1\" ]]; then \n          exit
+          0\n        fi\n        exit 1"
+      failureThreshold: 3
+      periodSeconds: 10
+      successThreshold: 1
+      timeoutSeconds: 1
+    resources:
+      limits:
+        memory: 100Mi
+      requests:
+        cpu: 100m
+        memory: 100Mi
+    terminationMessagePath: /dev/termination-log
+    terminationMessagePolicy: File
+    volumeMounts:
+    - mountPath: /work-dir
+      name: workdir
+    - mountPath: /data/configdb
+      name: config
+    - mountPath: /data/db
+      name: datadir
+    - mountPath: /init-scripts
+      name: init-scripts
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: kube-api-access-xdwnz
+      readOnly: true
+  - args:
+    - run
+    - --db-name=mongodb
+    - --db-kind=MongoDB
+    - --logtostderr=true
+    - --alsologtostderr=false
+    - --v=3
+    - --stderrthreshold=2
+    env:
+    - name: MONGO_INITDB_ROOT_USERNAME
+      valueFrom:
+        secretKeyRef:
+          key: username
+          name: mongodb-auth
+    - name: MONGO_INITDB_ROOT_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          key: password
+          name: mongodb-auth
+    - name: POD_NAME
+      valueFrom:
+        fieldRef:
+          apiVersion: v1
+          fieldPath: metadata.name
+    image: kubedb/replication-mode-detector:v0.11.0
+    imagePullPolicy: IfNotPresent
+    name: replication-mode-detector
+    resources: {}
+    terminationMessagePath: /dev/termination-log
+    terminationMessagePolicy: File
+    volumeMounts:
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: kube-api-access-xdwnz
+      readOnly: true
+  dnsPolicy: ClusterFirst
+  enableServiceLinks: true
+  hostname: mongodb-0
+  initContainers:
+  - args:
+    - -c
+    - "\n\t\t\techo \"running install.sh\"\n\t\t\t/scripts/install.sh"
+    command:
+    - /bin/sh
+    env:
+    - name: SSL_MODE
+      value: disabled
+    image: kubedb/mongodb-init:4.2-v3
+    imagePullPolicy: IfNotPresent
+    name: copy-config
+    resources:
+      limits:
+        memory: 100Mi
+      requests:
+        cpu: 100m
+        memory: 100Mi
+    terminationMessagePath: /dev/termination-log
+    terminationMessagePolicy: File
+    volumeMounts:
+    - mountPath: /data/configdb
+      name: config
+    - mountPath: /init-scripts
+      name: init-scripts
+    - mountPath: /var/run/mongodb/tls
+      name: certdir
+    - mountPath: /keydir-readonly
+      name: keydir
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: kube-api-access-xdwnz
+      readOnly: true
+  nodeName: kind-control-plane
+  preemptionPolicy: PreemptLowerPriority
+  priority: 0
+  restartPolicy: Always
+  schedulerName: default-scheduler
+  securityContext: {}
+  serviceAccount: mongodb
+  serviceAccountName: mongodb
+  subdomain: mongodb-pods
+  terminationGracePeriodSeconds: 30
+  tolerations:
+  - effect: NoExecute
+    key: node.kubernetes.io/not-ready
+    operator: Exists
+    tolerationSeconds: 300
+  - effect: NoExecute
+    key: node.kubernetes.io/unreachable
+    operator: Exists
+    tolerationSeconds: 300
+  volumes:
+  - name: datadir
+    persistentVolumeClaim:
+      claimName: datadir-mongodb-0
+  - emptyDir: {}
+    name: workdir
+  - emptyDir: {}
+    name: init-scripts
+  - emptyDir: {}
+    name: certdir
+  - name: keydir
+    secret:
+      defaultMode: 256
+      secretName: mongodb-key
+  - emptyDir: {}
+    name: config
+  - name: kube-api-access-xdwnz
+    projected:
+      defaultMode: 420
+      sources:
+      - serviceAccountToken:
+          expirationSeconds: 3607
+          path: token
+      - configMap:
+          items:
+          - key: ca.crt
+            path: ca.crt
+          name: kube-root-ca.crt
+      - downwardAPI:
+          items:
+          - fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+            path: namespace
+status:
+  conditions:
+  - lastProbeTime: null
+    lastTransitionTime: "2022-02-15T08:37:06Z"
+    status: "True"
+    type: Initialized
+  - lastProbeTime: null
+    lastTransitionTime: "2022-02-15T08:37:25Z"
+    status: "True"
+    type: Ready
+  - lastProbeTime: null
+    lastTransitionTime: "2022-02-15T08:37:25Z"
+    status: "True"
+    type: ContainersReady
+  - lastProbeTime: null
+    lastTransitionTime: "2022-02-15T08:37:05Z"
+    status: "True"
+    type: PodScheduled
+  containerStatuses:
+  - containerID: containerd://074493115b506c6b31caca0f042001d35827662f2342573fd09a175d5f1346d3
+    image: docker.io/library/mongo:4.4.6
+    imageID: docker.io/library/mongo@sha256:6efa052039903e731e4a5550c68a13c4869ddc93742c716332883fd9c77eb79b
+    lastState: {}
+    name: mongodb
+    ready: true
+    restartCount: 0
+    started: true
+    state:
+      running:
+        startedAt: "2022-02-15T08:37:06Z"
+  - containerID: containerd://44476b15f2cceab3f8870047c0ddac522f9bb77bab689cbc3528f3a4ba760a5d
+    image: docker.io/kubedb/replication-mode-detector:v0.11.0
+    imageID: docker.io/kubedb/replication-mode-detector@sha256:2fc794e2317f7a22c787c2325254b51adc426856b46ddaca958ceea9f19da578
+    lastState: {}
+    name: replication-mode-detector
+    ready: true
+    restartCount: 0
+    started: true
+    state:
+      running:
+        startedAt: "2022-02-15T08:37:24Z"
+  hostIP: 172.19.0.2
+  initContainerStatuses:
+  - containerID: containerd://79561119b1161afddb10296dc4639ca1c9b1bde8142383c892ab6a48994ee2f3
+    image: docker.io/kubedb/mongodb-init:4.2-v3
+    imageID: docker.io/kubedb/mongodb-init@sha256:77a9baacff0cd4037ffe0833fa1959c9b3b8f60db92eb8e53eaa19d6ecf651eb
+    lastState: {}
+    name: copy-config
+    ready: true
+    restartCount: 0
+    state:
+      terminated:
+        containerID: containerd://79561119b1161afddb10296dc4639ca1c9b1bde8142383c892ab6a48994ee2f3
+        exitCode: 0
+        finishedAt: "2022-02-15T08:37:06Z"
+        reason: Completed
+        startedAt: "2022-02-15T08:37:06Z"
+  phase: Running
+  podIP: 10.244.0.209
+  podIPs:
+  - ip: 10.244.0.209
+  qosClass: Burstable
+  startTime: "2022-02-15T08:37:05Z"

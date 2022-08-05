@@ -1,0 +1,10 @@
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: mongo-updated-ca-issuer
+  namespace: db
+spec:
+  ca:
+    secretName: mongo-updated-ca
+
+# kubectl create secret tls mongo-updated-ca --cert=ca.crt --key=ca.key --namespace=db

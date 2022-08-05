@@ -1,0 +1,62 @@
+
+
+# mongo --ipv6 --host localhost --tls --tlsCAFile /var/run/mongodb/tls/ca.crt --tlsCertificateKeyFile /var/run/mongodb/tls/mongo.pem -u root -p "$MONGO_INITDB_ROOT_PASSWORD"
+
+check subject : 
+openssl x509 -in /var/run/mongodb/tls/ca.crt -inform PEM -subject -nameopt RFC2253 -noout
+
+check enddate : 
+openssl x509 -in /var/run/mongodb/tls/client.pem -inform PEM -enddate -nameopt RFC2253 -noout
+
+db.adminCommand({ getParameter:1, sslMode:1 })
+
+
+# x=$(mongo admin "$ipv6" --host localhost "${ssl_args[@]}")
+# log "x = $x"
+# y=$(mongo admin --host localhost)
+# log "y = $y"
+# z=$(mongo admin "$ipv6" --host localhost "${ssl_args[@]}" --eval "rs.status().myState")
+# log "z = $z"
+# w=$(mongo admin "$ipv6" --host localhost "${ssl_args[@]}" --eval "db.adminCommand('ping')")
+# log "w = $w"
+
+
+# When trying tls. In arbiter pod log.txt
+[2022-03-03T05:37:06,028824485+00:00] [arbiter.sh] Running command mongo admin --ipv6 --host mongodb-0.mongodb-pods.db.svc --tls --tlsCAFile /var/run/mongodb/tls/ca.crt --tlsCertificateKeyFile /var/run/mongodb/tls/mongo.pem --quiet --eval JSON.stringify(rs.isMaster()) . . .
+[2022-03-03T05:37:06,072026135+00:00] [arbiter.sh] {"t":{"$date":"2022-03-03T05:37:06.069Z"},"s":"E",  "c":"NETWORK",  "id":23257,   "ctx":"js","msg":"The server certificate does not match the remote host name","attr":{"remoteHost":"mongodb-0.mongodb-pods.db.svc","certificateNames":"SAN(s): *.mongodb-arbiter-pods.db.svc, *.mongodb-arbiter-pods.db.svc.cluster.local, localhost, mongodb, mongodb.db.svc, 127.0.0.1, CN: mongodb.db.svc"}}
+Error: couldn't connect to server mongodb-0.mongodb-pods.db.svc:27017, connection attempt failed: SSLHandshakeFailed: The server certificate does not match the host name. Hostname: mongodb-0.mongodb-pods.db.svc does not match SAN(s): *.mongodb-arbiter-pods.db.svc, *.mongodb-arbiter-pods.db.svc.cluster.local, localhost, mongodb, mongodb.db.svc, 127.0.0.1, CN: mongodb.db.svc :
+connect@src/mongo/shell/mongo.js:374:17
+@(connect):3:6
+exception: connect failed
+exiting with code 1
+
+
+# configSecret testing
+db.serverCmdLineOpts()
+db._adminCommand( {getCmdLineOpts: 1})
+mongod.conf file consists => 
+net:
+   maxIncomingConnections: 10000
+kubectl create secret generic -n db custom-config --from-file=./mongod.conf
+
+
+rs.initiate(
+   {
+      _id: "rs0",
+      version: 1,
+      members: [
+         { _id: 0, host : "localhost:27017" },
+         { _id: 1, host : "localhost:27018" },
+         { _id: 2, host : "localhost:27019" }
+      ]
+   }
+)
+
+
+PostStartHookError: command '/bin/bash -c /init-scripts/peer-finder -on-start=/init-scripts/sharding.sh 
+-service=mongo-sh-6b5pe8-shard0-pods' exited with 1: 2022/03/10 10:44:15 Determined Domain to be mongodb-8lle4x.svc.cluster.local...
+
+[arbiter.sh] {\"ok\":0,\"errmsg\":\"Found two member configurations with same host field, 
+members.3.host == members.4.host == mongo-sh-03i2io-shard1-arbiter-0.mongo-sh-03i2io-shard1-arbiter-pods.mongodb-9ttiyo.svc:27017\",\"code\":103,\
+"codeName\":\"NewReplicaSetConfigurationIncompatible\"}\nparse error: Invalid numeric literal at line 1, column 8\nparse error: Invalid numeric literal at line 1, 
+column 8\nparse error: Invalid numeric literal at line 1, column 8\nparse error: Invalid numeric literal at line 1, column 8\n"

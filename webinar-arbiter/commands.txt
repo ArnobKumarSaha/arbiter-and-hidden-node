@@ -1,0 +1,39 @@
+
+mongo --ipv6 --host localhost --tls --tlsCAFile /var/run/mongodb/tls/ca.crt --tlsCertificateKeyFile /var/run/mongodb/tls/mongo.pem -u root -p "$MONGO_INITDB_ROOT_PASSWORD"
+
+mongo -u root -p "$MONGO_INITDB_ROOT_PASSWORD"
+
+kubectl create secret generic -n db custom-config --from-file=./mongod.conf
+kubectl create secret generic -n db log-config --from-file=mongod.conf=./arb-log.conf
+rs.slaveOk()
+
+
+##
+create secret + issuer + replica
+show resources + rs.status()
+applying verticalScale opsRequest
+show resources + rs.status()
+
+
+
+
+#####################################
+create custom-config
+apply shard
+show for general /data/configdb/mongodb.conf
+show rs.status(), db._adminCommand({getCmdLineOpts: 1})
+
+--
+Now let me create a config secret &  apply mongodb opsReq of type reconfigure. As this can take a good amount of time to become successful , we are applying it early.
+I will show you all the yamls in a while.
+create log-config    careful <<--from-file>>
+apply reconfigure
+So lets see in details, what we have just created.
+
+
+vertical, Reconfigure, Horizontal,  VolumeExpansion, Restart, ReconfigureTLS, Upgrade.  you can bla bla.
+As these opsReq takes a good amount of time to gets successful,  To keep this webinar compact we just showed VertialScale for replicaset, & reconfigure for sharded cluster.
+
+----
+show rs.status(), db._adminCommand({getCmdLineOpts: 1})
+show for arbitrer /data/configdb/mongodb.conf & log.txt

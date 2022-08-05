@@ -1,0 +1,365 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: "2022-02-28T12:48:04Z"
+  generateName: mongo-mongos-
+  labels:
+    app.kubernetes.io/component: database
+    app.kubernetes.io/instance: mongo
+    app.kubernetes.io/managed-by: kubedb.com
+    app.kubernetes.io/name: mongodbs.kubedb.com
+    controller-revision-hash: mongo-mongos-794c757485
+    mongodb.kubedb.com/node.mongos: mongo-mongos
+    statefulset.kubernetes.io/pod-name: mongo-mongos-0
+  name: mongo-mongos-0
+  namespace: db
+  ownerReferences:
+  - apiVersion: apps/v1
+    blockOwnerDeletion: true
+    controller: true
+    kind: StatefulSet
+    name: mongo-mongos
+    uid: 42eae239-72f4-4332-b7b3-a2e5a2b79544
+  resourceVersion: "754694"
+  uid: b279738e-0c7c-44e6-8b83-8d77e333a664
+spec:
+  affinity:
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+      - podAffinityTerm:
+          labelSelector:
+            matchLabels:
+              app.kubernetes.io/instance: mongo
+              app.kubernetes.io/managed-by: kubedb.com
+              app.kubernetes.io/name: mongodbs.kubedb.com
+              mongodb.kubedb.com/node.mongos: mongo-mongos
+          namespaces:
+          - db
+          topologyKey: kubernetes.io/hostname
+        weight: 100
+      - podAffinityTerm:
+          labelSelector:
+            matchLabels:
+              app.kubernetes.io/instance: mongo
+              app.kubernetes.io/managed-by: kubedb.com
+              app.kubernetes.io/name: mongodbs.kubedb.com
+              mongodb.kubedb.com/node.mongos: mongo-mongos
+          namespaces:
+          - db
+          topologyKey: failure-domain.beta.kubernetes.io/zone
+        weight: 50
+  dnsPolicy: ClusterFirst
+  enableServiceLinks: true
+  hostname: mongo-mongos-0
+  nodeName: kind-control-plane
+  preemptionPolicy: PreemptLowerPriority
+  priority: 0
+  restartPolicy: Always
+  schedulerName: default-scheduler
+  securityContext: {}
+  serviceAccount: mongo
+  serviceAccountName: mongo
+  subdomain: mongo-mongos-pods
+  terminationGracePeriodSeconds: 30
+  tolerations:
+  - effect: NoExecute
+    key: node.kubernetes.io/not-ready
+    operator: Exists
+    tolerationSeconds: 300
+  - effect: NoExecute
+    key: node.kubernetes.io/unreachable
+    operator: Exists
+    tolerationSeconds: 300
+status:
+  conditions:
+  - lastProbeTime: null
+    lastTransitionTime: "2022-02-28T12:48:13Z"
+    status: "True"
+    type: Initialized
+  - lastProbeTime: null
+    lastTransitionTime: "2022-02-28T12:48:04Z"
+    message: 'containers with unready status: [mongodb]'
+    reason: ContainersNotReady
+    status: "False"
+    type: Ready
+  - lastProbeTime: null
+    lastTransitionTime: "2022-02-28T12:48:04Z"
+    message: 'containers with unready status: [mongodb]'
+    reason: ContainersNotReady
+    status: "False"
+    type: ContainersReady
+  - lastProbeTime: null
+    lastTransitionTime: "2022-02-28T12:48:04Z"
+    status: "True"
+    type: PodScheduled
+  containerStatuses:
+  - containerID: containerd://01b9a706cb44f4ed04dc82019e5b2fc1fe6e207d58d8364445983c08549c331e
+    image: docker.io/library/mongo:4.4.6
+    imageID: docker.io/library/mongo@sha256:6efa052039903e731e4a5550c68a13c4869ddc93742c716332883fd9c77eb79b
+    lastState:
+      terminated:
+        containerID: containerd://01b9a706cb44f4ed04dc82019e5b2fc1fe6e207d58d8364445983c08549c331e
+        exitCode: 14
+        finishedAt: "2022-02-28T12:49:27Z"
+        reason: Error
+        startedAt: "2022-02-28T12:49:27Z"
+    name: mongodb
+    ready: false
+    restartCount: 4
+    started: false
+    state:
+      waiting:
+        message: back-off 1m20s restarting failed container=mongodb pod=mongo-mongos-0_db(b279738e-0c7c-44e6-8b83-8d77e333a664)
+        reason: CrashLoopBackOff
+  hostIP: 172.19.0.2
+  initContainerStatuses:
+  - containerID: containerd://50494946349530e2b240742547524d2076092ef73a0533480e87fadc71e05af5
+    image: docker.io/arnobkumarsaha/mongodb-init:hello1
+    imageID: sha256:c7761b069e7f5be5ebb5f64d28f240bb32d0d6839fc0a6771a5aad0c23fa4d64
+    lastState: {}
+    name: copy-config
+    ready: true
+    restartCount: 0
+    state:
+      terminated:
+        containerID: containerd://50494946349530e2b240742547524d2076092ef73a0533480e87fadc71e05af5
+        exitCode: 0
+        finishedAt: "2022-02-28T12:48:05Z"
+        reason: Completed
+        startedAt: "2022-02-28T12:48:05Z"
+  - containerID: containerd://3b33221fd5ecc24d3fd052a534249aa8db7f94dcfcf45d9b6a34e90a8efa6e9c
+    image: docker.io/library/mongo:4.4.6
+    imageID: docker.io/library/mongo@sha256:6efa052039903e731e4a5550c68a13c4869ddc93742c716332883fd9c77eb79b
+    lastState: {}
+    name: bootstrap
+    ready: true
+    restartCount: 0
+    state:
+      terminated:
+        containerID: containerd://3b33221fd5ecc24d3fd052a534249aa8db7f94dcfcf45d9b6a34e90a8efa6e9c
+        exitCode: 0
+        finishedAt: "2022-02-28T12:48:12Z"
+        reason: Completed
+        startedAt: "2022-02-28T12:48:05Z"
+  phase: Running
+  podIP: 10.244.0.239
+  podIPs:
+  - ip: 10.244.0.239
+  qosClass: Burstable
+  startTime: "2022-02-28T12:48:04Z"
+
+
+
+volumes:
+- emptyDir: {}
+  name: config
+- emptyDir: {}
+  name: init-scripts
+- emptyDir: {}
+  name: certdir
+- name: client-cert
+  secret:
+    defaultMode: 256
+    secretName: mongo-client-cert
+- name: server-cert
+  secret:
+    defaultMode: 256
+    secretName: mongo-mongos-server-cert
+- emptyDir: {}
+  name: workdir
+- name: kube-api-access-dvrvl
+  projected:
+    defaultMode: 420
+    sources:
+    - serviceAccountToken:
+        expirationSeconds: 3607
+        path: token
+    - configMap:
+        items:
+        - key: ca.crt
+          path: ca.crt
+        name: kube-root-ca.crt
+    - downwardAPI:
+        items:
+        - fieldRef:
+            apiVersion: v1
+            fieldPath: metadata.namespace
+          path: namespace
+
+
+initContainers:
+  - args:
+    - -c
+    - "echo \"running install.sh\"\n\t\t\t/scripts/install.sh"
+    command:
+    - /bin/sh
+    image: arnobkumarsaha/mongodb-init:hello1
+    imagePullPolicy: IfNotPresent
+    name: copy-config
+    resources:
+      limits:
+        memory: 100Mi
+      requests:
+        cpu: 100m
+        memory: 100Mi
+    terminationMessagePath: /dev/termination-log
+    terminationMessagePolicy: File
+    volumeMounts:
+    - mountPath: /data/configdb
+      name: config
+    - mountPath: /init-scripts
+      name: init-scripts
+    - mountPath: /var/run/mongodb/tls
+      name: certdir
+    - mountPath: /client-cert
+      name: client-cert
+    - mountPath: /server-cert
+      name: server-cert
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: kube-api-access-dvrvl
+      readOnly: true
+  - args:
+    - -c
+    - /init-scripts/mongos.sh
+    command:
+    - /bin/sh
+    env:
+    - name: AUTH
+      value: "true"
+    - name: SSL_MODE
+      value: requireSSL
+    - name: CLUSTER_AUTH_MODE
+      value: x509
+    - name: MONGO_INITDB_ROOT_USERNAME
+      valueFrom:
+        secretKeyRef:
+          key: username
+          name: mongo-auth
+    - name: MONGO_INITDB_ROOT_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          key: password
+          name: mongo-auth
+    - name: CONFIGDB_REPSET
+      value: cnfRepSet/mongo-configsvr-0.mongo-configsvr-pods.db.svc:27017,mongo-configsvr-1.mongo-configsvr-pods.db.svc:27017,mongo-configsvr-2.mongo-configsvr-pods.db.svc:27017
+    - name: SHARD_REPSETS
+      value: shard0/mongo-shard0-0.mongo-shard0-pods.db.svc:27017,mongo-shard0-1.mongo-shard0-pods.db.svc:27017,mongo-shard0-2.mongo-shard0-pods.db.svc:27017
+        shard1/mongo-shard1-0.mongo-shard1-pods.db.svc:27017,mongo-shard1-1.mongo-shard1-pods.db.svc:27017,mongo-shard1-2.mongo-shard1-pods.db.svc:27017
+    - name: SERVICE_NAME
+      value: mongo
+    image: mongo:4.4.6
+    imagePullPolicy: IfNotPresent
+    name: bootstrap
+    resources: {}
+    terminationMessagePath: /dev/termination-log
+    terminationMessagePolicy: File
+    volumeMounts:
+    - mountPath: /work-dir
+      name: workdir
+    - mountPath: /data/configdb
+      name: config
+    - mountPath: /init-scripts
+      name: init-scripts
+    - mountPath: /var/run/mongodb/tls
+      name: certdir
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: kube-api-access-dvrvl
+      readOnly: true
+  
+
+
+
+containers:
+  - args:
+    - --bind_ip_all
+    - --port=27017
+    - --clusterAuthMode=x509
+    - --keyFile=/data/configdb/key.txt
+    - --configdb=$(CONFIGDB_REPSET)
+    - --ipv6
+    - --tlsMode=requireTLS
+    - --tlsCAFile=/var/run/mongodb/tls/ca.crt
+    - --tlsCertificateKeyFile=/var/run/mongodb/tls/mongo.pem
+    command:
+    - mongos
+    env:
+    - name: CONFIGDB_REPSET
+      value: cnfRepSet/mongo-configsvr-0.mongo-configsvr-pods.db.svc:27017,mongo-configsvr-1.mongo-configsvr-pods.db.svc:27017,mongo-configsvr-2.mongo-configsvr-pods.db.svc:27017
+    - name: SHARD_REPSETS
+      value: shard0/mongo-shard0-0.mongo-shard0-pods.db.svc:27017,mongo-shard0-1.mongo-shard0-pods.db.svc:27017,mongo-shard0-2.mongo-shard0-pods.db.svc:27017
+        shard1/mongo-shard1-0.mongo-shard1-pods.db.svc:27017,mongo-shard1-1.mongo-shard1-pods.db.svc:27017,mongo-shard1-2.mongo-shard1-pods.db.svc:27017
+    - name: SERVICE_NAME
+      value: mongo
+    - name: MONGO_INITDB_ROOT_USERNAME
+      valueFrom:
+        secretKeyRef:
+          key: username
+          name: mongo-auth
+    - name: MONGO_INITDB_ROOT_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          key: password
+          name: mongo-auth
+    - name: POD_NAME
+      valueFrom:
+        fieldRef:
+          apiVersion: v1
+          fieldPath: metadata.name
+    image: mongo:4.4.6
+    imagePullPolicy: IfNotPresent
+    lifecycle:
+      preStop:
+        exec:
+          command:
+          - bash
+          - -c
+          - 'mongo admin --username=$MONGO_INITDB_ROOT_USERNAME --password=$MONGO_INITDB_ROOT_PASSWORD
+            --quiet --eval "db.adminCommand({ shutdown: 1 })" || true'
+    livenessProbe:
+      exec:
+        command:
+        - bash
+        - -c
+        - "set -x; if [[ $(mongo admin --host=localhost --tls --tlsCAFile=/var/run/mongodb/tls/ca.crt
+          --tlsCertificateKeyFile=/var/run/mongodb/tls/client.pem --username=$MONGO_INITDB_ROOT_USERNAME
+          --password=$MONGO_INITDB_ROOT_PASSWORD --authenticationDatabase=admin --quiet
+          --eval \"db.adminCommand('ping').ok\" ) -eq \"1\" ]]; then \n          exit
+          0\n        fi\n        exit 1"
+      failureThreshold: 3
+      periodSeconds: 10
+      successThreshold: 1
+      timeoutSeconds: 5
+    name: mongodb
+    ports:
+    - containerPort: 27017
+      name: db
+      protocol: TCP
+    readinessProbe:
+      exec:
+        command:
+        - bash
+        - -c
+        - "set -x; if [[ $(mongo admin --host=localhost --tls --tlsCAFile=/var/run/mongodb/tls/ca.crt
+          --tlsCertificateKeyFile=/var/run/mongodb/tls/client.pem --username=$MONGO_INITDB_ROOT_USERNAME
+          --password=$MONGO_INITDB_ROOT_PASSWORD --authenticationDatabase=admin --quiet
+          --eval \"db.adminCommand('ping').ok\" ) -eq \"1\" ]]; then \n          exit
+          0\n        fi\n        exit 1"
+      failureThreshold: 3
+      periodSeconds: 10
+      successThreshold: 1
+      timeoutSeconds: 1
+    resources:
+      limits:
+        memory: 100Mi
+      requests:
+        cpu: 100m
+        memory: 100Mi
+    terminationMessagePath: /dev/termination-log
+    terminationMessagePolicy: File
+    volumeMounts:
+    - mountPath: /data/configdb
+      name: config
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: kube-api-access-dvrvl
+      readOnly: true
+  

@@ -1,0 +1,9 @@
+apiVersion: ops.kubedb.com/v1alpha1
+kind: MongoDBOpsRequest
+metadata:
+  name: restart
+  namespace: db
+spec:
+  type: Restart
+  databaseRef:
+    name: mongodb

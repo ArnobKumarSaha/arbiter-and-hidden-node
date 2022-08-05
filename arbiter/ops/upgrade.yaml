@@ -1,0 +1,11 @@
+apiVersion: ops.kubedb.com/v1alpha1
+kind: MongoDBOpsRequest
+metadata:
+  name: db-upgrade
+  namespace: db
+spec:
+  type: Upgrade
+  databaseRef:
+    name: mongodb
+  upgrade:
+    targetVersion: 5.0.3

@@ -1,0 +1,18 @@
+apiVersion: ops.kubedb.com/v1alpha1
+kind: MongoDBOpsRequest
+metadata:
+  name: horizontal-scale
+  namespace: db
+spec:
+  type: HorizontalScaling
+  databaseRef:
+    name: mongodb
+  horizontalScaling:
+    replicas: 2
+    # shard: 
+    #   shards: 2
+    #   replicas: 2
+    # mongos:
+    #   replicas: 2
+    # configServer:
+    #   replicas: 2

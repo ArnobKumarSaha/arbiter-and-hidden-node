@@ -1,0 +1,68 @@
+apiVersion: kubedb.com/v1alpha2
+kind: MongoDB
+metadata:
+  name: mongodb
+  namespace: db
+spec:
+  allowedSchemas:
+    namespaces:
+      from: Selector
+      selector:
+        matchLabels:
+         kubernetes.io/metadata.name: dev
+  version: "4.4.6"
+  # storageEngine: inMemory
+  shardTopology:
+    configServer:
+      replicas: 3
+      podTemplate:
+        spec:
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "100Mi"
+      storage:
+        resources:
+          requests:
+            storage: 100Mi
+        storageClassName: standard
+    mongos:
+      # configSecret:
+      #   name: custom-config
+      replicas: 2
+      podTemplate:
+        spec:
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "100Mi"
+    shard:
+      #   configSecret:
+      #     name: custom-config
+      replicas: 2
+      podTemplate:
+        spec:
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "100Mi"
+      shards: 2
+      storage:
+        resources:
+          requests:
+            storage: 100Mi
+        storageClassName: standard
+  sslMode: requireSSL
+  tls:
+    issuerRef:
+      apiGroup: "cert-manager.io"
+      kind: Issuer
+      name: mongo-ca-issuer
+  clusterAuthMode: x509
+  # init:
+  #   script:
+  #     configMap:
+  #       name: mg-init
+  terminationPolicy: WipeOut
+  arbiter:
+    podTemplate: null

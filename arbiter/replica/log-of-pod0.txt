@@ -1,0 +1,28 @@
+Defaulted container "mongodb" out of: mongodb, replication-mode-detector, copy-config (init)
+root@mongodb-0:/# cat work-dir/log.txt
+[2022-02-15T08:37:11,955923927+00:00] [replicaset.sh] Bootstrapping MongoDB replica set member: mongodb-0
+[2022-02-15T08:37:11,957162786+00:00] [replicaset.sh] Reading standard input...
+[2022-02-15T08:37:11,958336335+00:00] [replicaset.sh] Peers:
+
+[2022-02-15T08:37:11,959370684+00:00] [replicaset.sh] Waiting for MongoDB to be ready...
+[2022-02-15T08:37:11,960366790+00:00] [replicaset.sh] Running command mongo --ipv6 --host localhost --eval db.adminCommand('ping') . . .
+[2022-02-15T08:37:12,033415754+00:00] [replicaset.sh] MongoDB shell version v4.4.6
+connecting to: mongodb://localhost:27017/?compressors=disabled&gssapiServiceName=mongodb
+Implicit session: session { "id" : UUID("03c95372-ef82-497a-8282-2326e25544b9") }
+MongoDB server version: 4.4.6
+{ "ok" : 1 }
+
+[2022-02-15T08:37:12,042459584+00:00] [replicaset.sh] Running command mongo admin --ipv6 --host localhost --quiet --eval JSON.stringify(rs.isMaster()) . . .
+[2022-02-15T08:37:12,080525422+00:00] [replicaset.sh] {"topologyVersion":{"processId":{"$oid":"620b6632a3860709a0e4187e"},"counter":{"$numberLong":"0"}},"ismaster":false,"secondary":false,"info":"Does not have a valid replica set config","isreplicaset":true,"maxBsonObjectSize":16777216,"maxMessageSizeBytes":48000000,"maxWriteBatchSize":100000,"localTime":"2022-02-15T08:37:12.076Z","logicalSessionTimeoutMinutes":30,"connectionId":2,"minWireVersion":0,"maxWireVersion":9,"readOnly":false,"ok":1}
+[2022-02-15T08:37:12,083680178+00:00] [replicaset.sh] Initialized.
+
+[2022-02-15T08:37:17,266188840+00:00] [replicaset.sh] Initiating a new replica set with myself (mongodb-0.mongodb-pods.db.svc.cluster.local)...
+[2022-02-15T08:37:17,267423447+00:00] [replicaset.sh] Running command mongo --ipv6 --host localhost --quiet --eval JSON.stringify(rs.initiate({'_id': 'replicaset', 'writeConcernMajorityJournalDefault': false, 'members': [{'_id': 0, 'host': 'mongodb-0.mongodb-pods.db.svc.cluster.local'}]})) . . .
+[2022-02-15T08:37:17,443495822+00:00] [replicaset.sh] {"ok":1}
+[2022-02-15T08:37:22,449056600+00:00] [replicaset.sh] Waiting for replica to reach PRIMARY state...
+[2022-02-15T08:37:22,964379789+00:00] [replicaset.sh] ✓ Replica reached PRIMARY state.
+[2022-02-15T08:37:22,969214875+00:00] [replicaset.sh] Creating admin user...
+[2022-02-15T08:37:23,199865596+00:00] [replicaset.sh] Initialize init scripts
+[2022-02-15T08:37:23,202814968+00:00] [replicaset.sh] /init-scripts/replicaset.sh: ignoring /docker-entrypoint-initdb.d/*
+[2022-02-15T08:37:23,203912344+00:00] [replicaset.sh] Done.
+[2022-02-15T08:37:23,204953668+00:00] [replicaset.sh] Good bye.

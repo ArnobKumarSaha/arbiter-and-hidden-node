@@ -1,0 +1,30 @@
+apiVersion: kubedb.com/v1alpha2
+kind: MongoDB
+metadata:
+  name: mongodb
+  namespace: db
+spec:
+  allowedSchemas:
+    namespaces:
+      from: Selector
+      selector:
+        matchLabels:
+         kubernetes.io/metadata.name: dev
+  version: "4.4.6"
+  storageType: Durable
+  storage:
+    storageClassName: "standard"
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: 100Mi
+  # sslMode: preferSSL
+  # tls:
+  #   issuerRef:
+  #     apiGroup: "cert-manager.io"
+  #     kind: Issuer
+  #     name: mongo-ca-issuer
+  # clusterAuthMode: sendX509
+  # configSecret:
+  #   name: custom-config
