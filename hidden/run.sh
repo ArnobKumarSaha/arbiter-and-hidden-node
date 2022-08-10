@@ -8,19 +8,34 @@ conf=$(cat actual.conf)
 
 echo "$conf" > conf.json
 
-# x=$(cat conf.json | jq '.settings')
-x=$(echo "$conf" | jq -r '.settings')
-echo "$x"
+for var in "NumberLong" "ObjectId";do 
+    echo $var 
+    sed -i  -e "/$var/s/[)]//" -e "/$var/s/$var[(]//" conf.json
+    # sed -i  -e '/NumberLong/s/NumberLong[(]//' conf.json
+done
 
 
 
-# readarray -t my_array < <(jq -c '.[]' "$conf")
-# for item in "${my_array[@]}"; do
-#   original_name=$(jq '.version' <<< "$item")
-#   echo "$original_name"
-# done
+x=$(cat conf.json | jq '.members[]')
+# x=$(echo "$conf" | jq -r '.settings')
+# echo "$x"
 
-# mem=$(echo "${conf}" | jq -r '.')
-# echo "$mem"
+service_name=mg-rs-hidden-0.mg-rs-pods.demo.svc.cluster.local:27017
+
+readarray -t my_array < <(jq -c '.members[]' conf.json)
+for item in "${my_array[@]}"; do
+  host=$(jq '.host' <<< "$item")
+  hidden=$(jq '.hidden' <<< "$item")
+
+  # remove the quotation marks from the start & end
+  host=$(echo $host | sed -e 's/^"//' -e 's/"$//')
+  echo "$host" "$hidden"
+
+  if [[ "$host" == "$service_name" && "$hidden" == true ]]; then
+    echo "yaaa"
+  fi 
+done
+
+
 
 rm conf.json
