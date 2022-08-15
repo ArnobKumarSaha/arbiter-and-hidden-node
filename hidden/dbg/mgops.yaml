@@ -1,0 +1,16 @@
+apiVersion: ops.kubedb.com/v1alpha1
+kind: MongoDBOpsRequest
+metadata:
+  name: mops
+  namespace: demo
+spec:
+  type: Reconfigure
+  databaseRef:
+    name: rs
+  configuration:
+    replicaSet:
+      configSecret:
+        name: new-conf
+    arbiter:
+      configSecret:
+        name: new-conf

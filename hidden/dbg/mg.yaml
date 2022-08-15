@@ -1,0 +1,22 @@
+apiVersion: kubedb.com/v1alpha2
+kind: MongoDB
+metadata:
+  name: mongo
+  namespace: demo
+spec:
+  arbiter:
+    configSecret:
+      name: prev-conf
+  configSecret:
+    name: prev-conf
+  replicaSet:
+    name: rs
+  replicas: 2
+  storage:
+    resources:
+      requests:
+        storage: 1Gi
+    storageClassName: standard
+  storageType: Durable
+  terminationPolicy: WipeOut
+  version: 4.2.3

@@ -30,16 +30,16 @@ spec:
   #     kind: Issuer
   #     name: mongo-ca-issuer
   # clusterAuthMode: x509
-  # arbiter:
-  #   podTemplate: null
-  hidden:
-    podTemplate: {}
-    replicas: 2
-    storage:
-      storageClassName: "standard"
-      accessModes:
-        - ReadWriteOnce
-      resources:
-        requests:
-          storage: 100Mi
+  arbiter:
+    podTemplate: null
+  # hidden:
+  #   podTemplate: {}
+  #   replicas: 2
+  #   storage:
+  #     storageClassName: "standard"
+  #     accessModes:
+  #       - ReadWriteOnce
+  #     resources:
+  #       requests:
+  #         storage: 100Mi
   terminationPolicy: WipeOut

@@ -56,7 +56,7 @@ spec:
   #   podTemplate: null
   hidden:
     podTemplate: {}
-    replicas: 1
+    replicas: 2
     storage:
       storageClassName: "standard"
       accessModes:

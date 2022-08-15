@@ -1,11 +1,13 @@
 
 #!/bin/bash
 
-HOSTNAME=sh-shard0-hidden-2
-HIDDEN_COUNT=4
-for (( c=1; c<=$HIDDEN_COUNT; c++ )); do
-    cur_host=$(echo $HOSTNAME | sed -e "s/[-][0-9]*$/-$c/")  
-    # cur_host=${HOSTNAME//[-][0-9]*/}
+my_hostname=sh-shard0-hidden-2
+HIDDEN_REPLICA_COUNT=4
+GOVERNING_SERVICE_NAME=gvgv
+POD_NAMESPACE=ns
+
+for (( c=1; c<=$HIDDEN_REPLICA_COUNT; c++ )); do
+    cur_host=$(echo $my_hostname | sed -e "s/[-][0-9]*$/-${c}.${GOVERNING_SERVICE_NAME}.${POD_NAMESPACE}.svc/") 
     echo $c $cur_host
 done
 
