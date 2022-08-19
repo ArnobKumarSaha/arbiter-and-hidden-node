@@ -18,63 +18,60 @@ metadata:
 type: Opaque
 
 ---
-apiVersion: kubedb.com/v1alpha2
-kind: MongoDB
-metadata:
-  name: mongo
-  namespace: demo
-spec:
-  arbiter:
-    configSecret:
-      name: prev-conf
-  hidden:
-    podTemplate: {}
-    replicas: 2
-    storage:
-      storageClassName: "standard"
-      accessModes:
-        - ReadWriteOnce
-      resources:
-        requests:
-          storage: 100Mi
-  configSecret:
-    name: prev-conf
-  replicaSet:
-    name: rs
-  replicas: 2
-  sslMode: requireSSL
-  tls:
-    issuerRef:
-      apiGroup: "cert-manager.io"
-      kind: Issuer
-      name: mongo-ca-issuer
-  clusterAuthMode: x509
-  storage:
-    resources:
-      requests:
-        storage: 1Gi
-    storageClassName: standard
-  storageType: Durable
-  terminationPolicy: WipeOut
-  version: 4.2.3
-  #version: 4.4.6
----
-apiVersion: ops.kubedb.com/v1alpha1
-kind: MongoDBOpsRequest
-metadata:
-  name: mops
-  namespace: demo
-spec:
-  type: Reconfigure
-  databaseRef:
-    name: mongo
-  configuration:
-    # replicaSet:
-    #   configSecret:
-    #     name: new-conf
-    arbiter:
-      configSecret:
-        name: new-conf
-    # hidden:
-    #   configSecret:
-    #     name: new-conf
+# apiVersion: kubedb.com/v1alpha2
+# kind: MongoDB
+# metadata:
+#   name: mongo
+#   namespace: demo
+# spec:
+#   arbiter:
+#     configSecret:
+#       name: prev-conf
+#   hidden:
+#     podTemplate: {}
+#     replicas: 2
+#     storage:
+#       storageClassName: "standard"
+#       accessModes:
+#         - ReadWriteOnce
+#       resources:
+#         requests:
+#           storage: 100Mi
+#   configSecret:
+#     name: prev-conf
+#   replicaSet:
+#     name: rs
+#   replicas: 2
+#   sslMode: requireSSL
+#   tls:
+#     issuerRef:
+#       apiGroup: "cert-manager.io"
+#       kind: Issuer
+#       name: mongo-ca-issuer
+#   clusterAuthMode: x509
+#   storage:
+#     resources:
+#       requests:
+#         storage: 1Gi
+#     storageClassName: standard
+#   storageType: Durable
+#   terminationPolicy: WipeOut
+#   version: 4.2.3
+#   #version: 4.4.6
+# ---
+# apiVersion: ops.kubedb.com/v1alpha1
+# kind: MongoDBOpsRequest
+# metadata:
+#   name: mops
+#   namespace: demo
+# spec:
+#   type: Reconfigure
+#   databaseRef:
+#     name: mongo
+#   configuration:
+#     arbiter:
+#       configSecret:
+#         name: new-conf
+#     hidden:
+#       configSecret:
+#         name: new-conf

@@ -1,0 +1,25 @@
+apiVersion: ops.kubedb.com/v1alpha1
+kind: MongoDBOpsRequest
+metadata:
+  name: vertical
+  namespace: demo
+spec:
+  type: VerticalScaling
+  databaseRef:
+    name: mongo
+  verticalScaling:
+    replicaSet:
+      requests:
+        memory: "300Mi"
+        cpu: "300m"
+    arbiter:
+      requests:
+        memory: "250Mi"
+        cpu: "250m"
+  configuration:
+    replicaSet:
+      configSecret:
+        name: prev-conf
+    arbiter:
+      configSecret:
+        name: new-conf

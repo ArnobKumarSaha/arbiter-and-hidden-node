@@ -1,0 +1,13 @@
+apiVersion: ops.kubedb.com/v1alpha1
+kind: MongoDBOpsRequest
+metadata:
+  name: horizontal
+  namespace: demo
+spec:
+  type: HorizontalScaling
+  databaseRef:
+    name: mongo
+  horizontalScaling:
+    replicas: 3
+    hidden:
+      replicas: 3

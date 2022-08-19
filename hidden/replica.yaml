@@ -1,28 +1,29 @@
 apiVersion: kubedb.com/v1alpha2
 kind: MongoDB
 metadata:
-  name: rs
+  name: mongo
   namespace: demo
 spec:
-  version: "4.4.6"
+  version: "4.2.3" #"4.4.6"
   replicaSet:
     name: "replicaset"
   podTemplate:
     spec:
       resources:
         requests:
-          cpu: "100m"
-          memory: "100Mi"
+          cpu: "200m"
+          memory: "200Mi"
   replicas: 2
   # storageEngine: inMemory
   storageType: Durable
   storage:
-    storageClassName: "standard"
+    # storageClassName: "longhorn"
+    storageClassName: linode-block-storage
     accessModes:
       - ReadWriteOnce
     resources:
       requests:
-        storage: 100Mi
+        storage: 300Mi
   # sslMode: requireSSL
   # tls:
   #   issuerRef:
@@ -31,15 +32,26 @@ spec:
   #     name: mongo-ca-issuer
   # clusterAuthMode: x509
   arbiter:
-    podTemplate: null
-  # hidden:
-  #   podTemplate: {}
-  #   replicas: 2
-  #   storage:
-  #     storageClassName: "standard"
-  #     accessModes:
-  #       - ReadWriteOnce
-  #     resources:
-  #       requests:
-  #         storage: 100Mi
+    podTemplate:
+      spec:
+        resources:
+          requests:
+            cpu: "150m"
+            memory: "150Mi"
+  hidden:
+    podTemplate:
+      spec:
+        resources:
+          requests:
+            cpu: "200m"
+            memory: "200Mi"
+    replicas: 2
+    storage:
+      # storageClassName: "longhorn"
+      storageClassName: linode-block-storage
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 400Mi
   terminationPolicy: WipeOut

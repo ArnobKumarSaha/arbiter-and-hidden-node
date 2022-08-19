@@ -1,0 +1,30 @@
+apiVersion: ops.kubedb.com/v1alpha1
+kind: MongoDBOpsRequest
+metadata:
+  name: expansion
+  namespace: demo
+spec:
+  type: VolumeExpansion  
+  databaseRef:
+    name: mongo
+  volumeExpansion:
+    replicaSet: 12Gi
+    hidden: 13Gi
+    mode: "Offline"
+
+# {"spec":
+# {"volumeClaimTemplates":
+# [{"apiVersion":"v1","kind":"PersistentVolumeClaim",
+
+# "metadata":
+# {"annotations":{"volume.beta.kubernetes.io/storage-class":"linode-block-storage"},
+# "creationTimestamp":null,"name":"datadir"},
+
+
+# "spec":
+# {"accessModes":["ReadWriteOnce"],
+# "resources":{"requests":{"storage":"12Gi"}},
+# "storageClassName":"linode-block-storage",
+# "volumeMode":"Filesystem"},
+
+# "status":{"phase":"Pending"}}]}}
