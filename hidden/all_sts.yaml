@@ -1,0 +1,1764 @@
+apiVersion: v1
+items:
+- apiVersion: apps/v1
+  kind: StatefulSet
+  metadata:
+    creationTimestamp: "2022-08-23T05:33:21Z"
+    generation: 1
+    labels:
+      app.kubernetes.io/component: database
+      app.kubernetes.io/instance: sh
+      app.kubernetes.io/managed-by: kubedb.com
+      app.kubernetes.io/name: mongodbs.kubedb.com
+      mongodb.kubedb.com/node.config: sh-configsvr
+    name: sh-configsvr
+    namespace: demo
+    ownerReferences:
+    - apiVersion: kubedb.com/v1alpha2
+      blockOwnerDeletion: true
+      controller: true
+      kind: MongoDB
+      name: sh
+      uid: e54c33e6-d6ec-4ee0-a457-0118aa208bbe
+    resourceVersion: "76672"
+    uid: 46337dec-7bef-44ad-ac0c-c1295c3094c7
+  spec:
+    podManagementPolicy: OrderedReady
+    replicas: 3
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app.kubernetes.io/instance: sh
+        app.kubernetes.io/managed-by: kubedb.com
+        app.kubernetes.io/name: mongodbs.kubedb.com
+        mongodb.kubedb.com/node.config: sh-configsvr
+    serviceName: sh-configsvr-pods
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          app.kubernetes.io/component: database
+          app.kubernetes.io/instance: sh
+          app.kubernetes.io/managed-by: kubedb.com
+          app.kubernetes.io/name: mongodbs.kubedb.com
+          mongodb.kubedb.com/node.config: sh-configsvr
+      spec:
+        affinity:
+          podAntiAffinity:
+            preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/instance: sh
+                    app.kubernetes.io/managed-by: kubedb.com
+                    app.kubernetes.io/name: mongodbs.kubedb.com
+                    mongodb.kubedb.com/node.config: sh-configsvr
+                namespaces:
+                - demo
+                topologyKey: kubernetes.io/hostname
+              weight: 100
+            - podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/instance: sh
+                    app.kubernetes.io/managed-by: kubedb.com
+                    app.kubernetes.io/name: mongodbs.kubedb.com
+                    mongodb.kubedb.com/node.config: sh-configsvr
+                namespaces:
+                - demo
+                topologyKey: failure-domain.beta.kubernetes.io/zone
+              weight: 50
+        containers:
+        - args:
+          - --bind_ip_all
+          - --port=27017
+          - --clusterAuthMode=keyFile
+          - --keyFile=/data/configdb/key.txt
+          - --dbpath=/data/db
+          - --auth
+          - --configsvr
+          - --replSet=cnfRepSet
+          - --ipv6
+          - --tlsMode=disabled
+          command:
+          - mongod
+          env:
+          - name: POD_NAMESPACE
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+          - name: REPLICA_SET
+            value: cnfRepSet
+          - name: AUTH
+            value: "true"
+          - name: SSL_MODE
+            value: disabled
+          - name: CLUSTER_AUTH_MODE
+            value: keyFile
+          - name: MONGO_INITDB_ROOT_USERNAME
+            valueFrom:
+              secretKeyRef:
+                key: username
+                name: sh-auth
+          - name: MONGO_INITDB_ROOT_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: password
+                name: sh-auth
+          - name: POD_NAME
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.name
+          image: mongo:4.2.3
+          imagePullPolicy: IfNotPresent
+          lifecycle:
+            postStart:
+              exec:
+                command:
+                - /bin/bash
+                - -c
+                - /init-scripts/peer-finder -on-start=/init-scripts/configdb.sh -service=sh-configsvr-pods
+          livenessProbe:
+            exec:
+              command:
+              - bash
+              - -c
+              - "set -x; if [[ $(mongo admin --host=localhost  --username=$MONGO_INITDB_ROOT_USERNAME
+                --password=$MONGO_INITDB_ROOT_PASSWORD --authenticationDatabase=admin
+                --quiet --eval \"db.adminCommand('ping').ok\" ) -eq \"1\" ]]; then
+                \n          exit 0\n        fi\n        exit 1"
+            failureThreshold: 3
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+          name: mongodb
+          ports:
+          - containerPort: 27017
+            name: db
+            protocol: TCP
+          readinessProbe:
+            exec:
+              command:
+              - bash
+              - -c
+              - "set -x; if [[ $(mongo admin --host=localhost  --username=$MONGO_INITDB_ROOT_USERNAME
+                --password=$MONGO_INITDB_ROOT_PASSWORD --authenticationDatabase=admin
+                --quiet --eval \"db.adminCommand('ping').ok\" ) -eq \"1\" ]]; then
+                \n          exit 0\n        fi\n        exit 1"
+            failureThreshold: 3
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              memory: 100Mi
+            requests:
+              cpu: 100m
+              memory: 100Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /work-dir
+            name: workdir
+          - mountPath: /data/configdb
+            name: config
+          - mountPath: /init-scripts
+            name: init-scripts
+          - mountPath: /data/db
+            name: datadir
+        dnsPolicy: ClusterFirst
+        initContainers:
+        - args:
+          - -c
+          - "\n\t\t\techo \"running install.sh\"\n\t\t\t/scripts/install.sh"
+          command:
+          - /bin/sh
+          env:
+          - name: SSL_MODE
+            value: disabled
+          image: arnobkumarsaha/mongo-init-docker:_linux_amd64
+          imagePullPolicy: IfNotPresent
+          name: copy-config
+          resources:
+            limits:
+              memory: 100Mi
+            requests:
+              cpu: 100m
+              memory: 100Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /data/configdb
+            name: config
+          - mountPath: /init-scripts
+            name: init-scripts
+          - mountPath: /var/run/mongodb/tls
+            name: certdir
+          - mountPath: /keydir-readonly
+            name: keydir
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        serviceAccount: sh
+        serviceAccountName: sh
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - emptyDir: {}
+          name: config
+        - emptyDir: {}
+          name: init-scripts
+        - emptyDir: {}
+          name: certdir
+        - name: keydir
+          secret:
+            defaultMode: 256
+            secretName: sh-key
+        - emptyDir: {}
+          name: workdir
+    updateStrategy:
+      type: OnDelete
+    volumeClaimTemplates:
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        annotations:
+          volume.beta.kubernetes.io/storage-class: standard
+        creationTimestamp: null
+        name: datadir
+      spec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 100Mi
+        storageClassName: standard
+        volumeMode: Filesystem
+      status:
+        phase: Pending
+  status:
+    availableReplicas: 3
+    collisionCount: 0
+    currentReplicas: 3
+    currentRevision: sh-configsvr-6598464bf5
+    observedGeneration: 1
+    readyReplicas: 3
+    replicas: 3
+    updateRevision: sh-configsvr-6598464bf5
+    updatedReplicas: 3
+- apiVersion: apps/v1
+  kind: StatefulSet
+  metadata:
+    creationTimestamp: "2022-08-23T05:35:12Z"
+    generation: 1
+    labels:
+      app.kubernetes.io/component: database
+      app.kubernetes.io/instance: sh
+      app.kubernetes.io/managed-by: kubedb.com
+      app.kubernetes.io/name: mongodbs.kubedb.com
+      mongodb.kubedb.com/node.mongos: sh-mongos
+    name: sh-mongos
+    namespace: demo
+    ownerReferences:
+    - apiVersion: kubedb.com/v1alpha2
+      blockOwnerDeletion: true
+      controller: true
+      kind: MongoDB
+      name: sh
+      uid: e54c33e6-d6ec-4ee0-a457-0118aa208bbe
+    resourceVersion: "76778"
+    uid: ae5f9e21-d64b-4fc0-a990-4fa463e546dd
+  spec:
+    podManagementPolicy: OrderedReady
+    replicas: 2
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app.kubernetes.io/instance: sh
+        app.kubernetes.io/managed-by: kubedb.com
+        app.kubernetes.io/name: mongodbs.kubedb.com
+        mongodb.kubedb.com/node.mongos: sh-mongos
+    serviceName: sh-mongos-pods
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          app.kubernetes.io/component: database
+          app.kubernetes.io/instance: sh
+          app.kubernetes.io/managed-by: kubedb.com
+          app.kubernetes.io/name: mongodbs.kubedb.com
+          mongodb.kubedb.com/node.mongos: sh-mongos
+      spec:
+        affinity:
+          podAntiAffinity:
+            preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/instance: sh
+                    app.kubernetes.io/managed-by: kubedb.com
+                    app.kubernetes.io/name: mongodbs.kubedb.com
+                    mongodb.kubedb.com/node.mongos: sh-mongos
+                namespaces:
+                - demo
+                topologyKey: kubernetes.io/hostname
+              weight: 100
+            - podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/instance: sh
+                    app.kubernetes.io/managed-by: kubedb.com
+                    app.kubernetes.io/name: mongodbs.kubedb.com
+                    mongodb.kubedb.com/node.mongos: sh-mongos
+                namespaces:
+                - demo
+                topologyKey: failure-domain.beta.kubernetes.io/zone
+              weight: 50
+        containers:
+        - args:
+          - --bind_ip_all
+          - --port=27017
+          - --clusterAuthMode=keyFile
+          - --keyFile=/data/configdb/key.txt
+          - --configdb=$(CONFIGDB_REPSET)
+          - --ipv6
+          - --tlsMode=disabled
+          command:
+          - mongos
+          env:
+          - name: CONFIGDB_REPSET
+            value: cnfRepSet/sh-configsvr-0.sh-configsvr-pods.demo.svc:27017,sh-configsvr-1.sh-configsvr-pods.demo.svc:27017,sh-configsvr-2.sh-configsvr-pods.demo.svc:27017
+          - name: SHARD_REPSETS
+            value: shard0/sh-shard0-0.sh-shard0-pods.demo.svc:27017,sh-shard0-1.sh-shard0-pods.demo.svc:27017
+              shard1/sh-shard1-0.sh-shard1-pods.demo.svc:27017,sh-shard1-1.sh-shard1-pods.demo.svc:27017
+              shard2/sh-shard2-0.sh-shard2-pods.demo.svc:27017,sh-shard2-1.sh-shard2-pods.demo.svc:27017
+              shard3/sh-shard3-0.sh-shard3-pods.demo.svc:27017,sh-shard3-1.sh-shard3-pods.demo.svc:27017
+              shard4/sh-shard4-0.sh-shard4-pods.demo.svc:27017,sh-shard4-1.sh-shard4-pods.demo.svc:27017
+          - name: SERVICE_NAME
+            value: sh
+          - name: MONGO_INITDB_ROOT_USERNAME
+            valueFrom:
+              secretKeyRef:
+                key: username
+                name: sh-auth
+          - name: MONGO_INITDB_ROOT_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: password
+                name: sh-auth
+          - name: POD_NAME
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.name
+          image: mongo:4.2.3
+          imagePullPolicy: IfNotPresent
+          lifecycle:
+            preStop:
+              exec:
+                command:
+                - bash
+                - -c
+                - 'mongo admin --username=$MONGO_INITDB_ROOT_USERNAME --password=$MONGO_INITDB_ROOT_PASSWORD
+                  --quiet --eval "db.adminCommand({ shutdown: 1 })" || true'
+          livenessProbe:
+            exec:
+              command:
+              - bash
+              - -c
+              - "set -x; if [[ $(mongo admin --host=localhost  --username=$MONGO_INITDB_ROOT_USERNAME
+                --password=$MONGO_INITDB_ROOT_PASSWORD --authenticationDatabase=admin
+                --quiet --eval \"db.adminCommand('ping').ok\" ) -eq \"1\" ]]; then
+                \n          exit 0\n        fi\n        exit 1"
+            failureThreshold: 3
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+          name: mongodb
+          ports:
+          - containerPort: 27017
+            name: db
+            protocol: TCP
+          readinessProbe:
+            exec:
+              command:
+              - bash
+              - -c
+              - "set -x; if [[ $(mongo admin --host=localhost  --username=$MONGO_INITDB_ROOT_USERNAME
+                --password=$MONGO_INITDB_ROOT_PASSWORD --authenticationDatabase=admin
+                --quiet --eval \"db.adminCommand('ping').ok\" ) -eq \"1\" ]]; then
+                \n          exit 0\n        fi\n        exit 1"
+            failureThreshold: 3
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              memory: 100Mi
+            requests:
+              cpu: 100m
+              memory: 100Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /work-dir
+            name: workdir
+          - mountPath: /data/configdb
+            name: config
+          - mountPath: /init-scripts
+            name: init-scripts
+        dnsPolicy: ClusterFirst
+        initContainers:
+        - args:
+          - -c
+          - "\n\t\t\techo \"running install.sh\"\n\t\t\t/scripts/install.sh"
+          command:
+          - /bin/sh
+          env:
+          - name: SSL_MODE
+            value: disabled
+          image: arnobkumarsaha/mongo-init-docker:_linux_amd64
+          imagePullPolicy: IfNotPresent
+          name: copy-config
+          resources:
+            limits:
+              memory: 100Mi
+            requests:
+              cpu: 100m
+              memory: 100Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /data/configdb
+            name: config
+          - mountPath: /init-scripts
+            name: init-scripts
+          - mountPath: /var/run/mongodb/tls
+            name: certdir
+          - mountPath: /keydir-readonly
+            name: keydir
+        - args:
+          - -c
+          - /init-scripts/mongos.sh
+          command:
+          - /bin/sh
+          env:
+          - name: AUTH
+            value: "true"
+          - name: SSL_MODE
+            value: disabled
+          - name: CLUSTER_AUTH_MODE
+            value: keyFile
+          - name: MONGO_INITDB_ROOT_USERNAME
+            valueFrom:
+              secretKeyRef:
+                key: username
+                name: sh-auth
+          - name: MONGO_INITDB_ROOT_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: password
+                name: sh-auth
+          - name: CONFIGDB_REPSET
+            value: cnfRepSet/sh-configsvr-0.sh-configsvr-pods.demo.svc:27017,sh-configsvr-1.sh-configsvr-pods.demo.svc:27017,sh-configsvr-2.sh-configsvr-pods.demo.svc:27017
+          - name: SHARD_REPSETS
+            value: shard0/sh-shard0-0.sh-shard0-pods.demo.svc:27017,sh-shard0-1.sh-shard0-pods.demo.svc:27017
+              shard1/sh-shard1-0.sh-shard1-pods.demo.svc:27017,sh-shard1-1.sh-shard1-pods.demo.svc:27017
+              shard2/sh-shard2-0.sh-shard2-pods.demo.svc:27017,sh-shard2-1.sh-shard2-pods.demo.svc:27017
+              shard3/sh-shard3-0.sh-shard3-pods.demo.svc:27017,sh-shard3-1.sh-shard3-pods.demo.svc:27017
+              shard4/sh-shard4-0.sh-shard4-pods.demo.svc:27017,sh-shard4-1.sh-shard4-pods.demo.svc:27017
+          - name: SERVICE_NAME
+            value: sh
+          image: mongo:4.2.3
+          imagePullPolicy: IfNotPresent
+          name: bootstrap
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /work-dir
+            name: workdir
+          - mountPath: /data/configdb
+            name: config
+          - mountPath: /init-scripts
+            name: init-scripts
+          - mountPath: /var/run/mongodb/tls
+            name: certdir
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        serviceAccount: sh
+        serviceAccountName: sh
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - emptyDir: {}
+          name: config
+        - emptyDir: {}
+          name: init-scripts
+        - emptyDir: {}
+          name: certdir
+        - name: keydir
+          secret:
+            defaultMode: 256
+            secretName: sh-key
+        - emptyDir: {}
+          name: workdir
+    updateStrategy:
+      type: OnDelete
+  status:
+    availableReplicas: 2
+    collisionCount: 0
+    currentReplicas: 2
+    currentRevision: sh-mongos-57b6cdf5fd
+    observedGeneration: 1
+    readyReplicas: 2
+    replicas: 2
+    updateRevision: sh-mongos-57b6cdf5fd
+    updatedReplicas: 2
+
+Patching StatefulSet demo/sh-shard0 with {"spec":{"template":{"spec":{"$setElementOrder/
+containers":[{"name":"mongodb"}],"$setElementOrder/initContainers":[{"name":"copy-config"}],
+"containers":[{"image":"mongo:4.2.3@sha256:58b25d51baa11a85b6aedf7c4e05710d12a27ddc2883e2692e7d58527d98bd73","name":"mongodb"}],
+"initContainers":[{"image":"arnobkumarsaha/mongo-init-docker:_linux_amd64@sha256:6954b117b6f7b74ec417f046c15e4fcfa2ce7931bb7ad34587c7b12b6d91a561",
+"name":"copy-config"}]}}}}.
+
+
+- apiVersion: apps/v1
+  kind: StatefulSet
+  metadata:
+    creationTimestamp: "2022-08-23T05:33:21Z"
+    generation: 1
+    labels:
+      app.kubernetes.io/component: database
+      app.kubernetes.io/instance: sh
+      app.kubernetes.io/managed-by: kubedb.com
+      app.kubernetes.io/name: mongodbs.kubedb.com
+      mongodb.kubedb.com/node.shard: sh-shard0
+    name: sh-shard0
+    namespace: demo
+    ownerReferences:
+    - apiVersion: kubedb.com/v1alpha2
+      blockOwnerDeletion: true
+      controller: true
+      kind: MongoDB
+      name: sh
+      uid: e54c33e6-d6ec-4ee0-a457-0118aa208bbe
+    resourceVersion: "76661"
+    uid: 2ca65764-d5d5-4680-823c-ef930cea4fbc
+  spec:
+    podManagementPolicy: OrderedReady
+    replicas: 2
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app.kubernetes.io/instance: sh
+        app.kubernetes.io/managed-by: kubedb.com
+        app.kubernetes.io/name: mongodbs.kubedb.com
+        mongodb.kubedb.com/node.shard: sh-shard0
+    serviceName: sh-shard0-pods
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          app.kubernetes.io/component: database
+          app.kubernetes.io/instance: sh
+          app.kubernetes.io/managed-by: kubedb.com
+          app.kubernetes.io/name: mongodbs.kubedb.com
+          mongodb.kubedb.com/node.shard: sh-shard0
+      spec:
+        affinity:
+          podAntiAffinity:
+            preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/instance: sh
+                    app.kubernetes.io/managed-by: kubedb.com
+                    app.kubernetes.io/name: mongodbs.kubedb.com
+                    mongodb.kubedb.com/node.shard: sh-shard0
+                namespaces:
+                - demo
+                topologyKey: kubernetes.io/hostname
+              weight: 100
+            - podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/instance: sh
+                    app.kubernetes.io/managed-by: kubedb.com
+                    app.kubernetes.io/name: mongodbs.kubedb.com
+                    mongodb.kubedb.com/node.shard: sh-shard0
+                namespaces:
+                - demo
+                topologyKey: failure-domain.beta.kubernetes.io/zone
+              weight: 50
+        containers:
+        - args:
+          - --bind_ip_all
+          - --port=27017
+          - --clusterAuthMode=keyFile
+          - --keyFile=/data/configdb/key.txt
+          - --dbpath=/data/db
+          - --auth
+          - --shardsvr
+          - --replSet=shard0
+          - --ipv6
+          - --tlsMode=disabled
+          command:
+          - mongod
+          env:
+          - name: POD_NAMESPACE
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+          - name: REPLICA_SET
+            value: shard0
+          - name: AUTH
+            value: "true"
+          - name: SSL_MODE
+            value: disabled
+          - name: CLUSTER_AUTH_MODE
+            value: keyFile
+          - name: MONGO_INITDB_ROOT_USERNAME
+            valueFrom:
+              secretKeyRef:
+                key: username
+                name: sh-auth
+          - name: MONGO_INITDB_ROOT_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: password
+                name: sh-auth
+          - name: POD_NAME
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.name
+          image: mongo:4.2.3
+          imagePullPolicy: IfNotPresent
+          lifecycle:
+            postStart:
+              exec:
+                command:
+                - /bin/bash
+                - -c
+                - /init-scripts/peer-finder -on-start=/init-scripts/sharding.sh -service=sh-shard0-pods
+          livenessProbe:
+            exec:
+              command:
+              - bash
+              - -c
+              - "set -x; if [[ $(mongo admin --host=localhost  --username=$MONGO_INITDB_ROOT_USERNAME
+                --password=$MONGO_INITDB_ROOT_PASSWORD --authenticationDatabase=admin
+                --quiet --eval \"db.adminCommand('ping').ok\" ) -eq \"1\" ]]; then
+                \n          exit 0\n        fi\n        exit 1"
+            failureThreshold: 3
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+          name: mongodb
+          ports:
+          - containerPort: 27017
+            name: db
+            protocol: TCP
+          readinessProbe:
+            exec:
+              command:
+              - bash
+              - -c
+              - "set -x; if [[ $(mongo admin --host=localhost  --username=$MONGO_INITDB_ROOT_USERNAME
+                --password=$MONGO_INITDB_ROOT_PASSWORD --authenticationDatabase=admin
+                --quiet --eval \"db.adminCommand('ping').ok\" ) -eq \"1\" ]]; then
+                \n          exit 0\n        fi\n        exit 1"
+            failureThreshold: 3
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              memory: 100Mi
+            requests:
+              cpu: 100m
+              memory: 100Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /work-dir
+            name: workdir
+          - mountPath: /data/configdb
+            name: config
+          - mountPath: /init-scripts
+            name: init-scripts
+          - mountPath: /data/db
+            name: datadir
+        dnsPolicy: ClusterFirst
+        initContainers:
+        - args:
+          - -c
+          - "\n\t\t\techo \"running install.sh\"\n\t\t\t/scripts/install.sh"
+          command:
+          - /bin/sh
+          env:
+          - name: SSL_MODE
+            value: disabled
+          image: arnobkumarsaha/mongo-init-docker:_linux_amd64
+          imagePullPolicy: IfNotPresent
+          name: copy-config
+          resources:
+            limits:
+              memory: 100Mi
+            requests:
+              cpu: 100m
+              memory: 100Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /data/configdb
+            name: config
+          - mountPath: /init-scripts
+            name: init-scripts
+          - mountPath: /var/run/mongodb/tls
+            name: certdir
+          - mountPath: /keydir-readonly
+            name: keydir
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        serviceAccount: sh
+        serviceAccountName: sh
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - emptyDir: {}
+          name: config
+        - emptyDir: {}
+          name: init-scripts
+        - emptyDir: {}
+          name: certdir
+        - name: keydir
+          secret:
+            defaultMode: 256
+            secretName: sh-key
+        - emptyDir: {}
+          name: workdir
+    updateStrategy:
+      type: OnDelete
+    volumeClaimTemplates:
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        annotations:
+          volume.beta.kubernetes.io/storage-class: standard
+        creationTimestamp: null
+        name: datadir
+      spec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 100Mi
+        storageClassName: standard
+        volumeMode: Filesystem
+      status:
+        phase: Pending
+  status:
+    availableReplicas: 2
+    collisionCount: 0
+    currentReplicas: 2
+    currentRevision: sh-shard0-8698bc95c5
+    observedGeneration: 1
+    readyReplicas: 2
+    replicas: 2
+    updateRevision: sh-shard0-8698bc95c5
+    updatedReplicas: 2
+- apiVersion: apps/v1
+  kind: StatefulSet
+  metadata:
+    creationTimestamp: "2022-08-23T05:33:21Z"
+    generation: 1
+    labels:
+      app.kubernetes.io/component: database
+      app.kubernetes.io/instance: sh
+      app.kubernetes.io/managed-by: kubedb.com
+      app.kubernetes.io/name: mongodbs.kubedb.com
+      mongodb.kubedb.com/node.shard: sh-shard1
+    name: sh-shard1
+    namespace: demo
+    ownerReferences:
+    - apiVersion: kubedb.com/v1alpha2
+      blockOwnerDeletion: true
+      controller: true
+      kind: MongoDB
+      name: sh
+      uid: e54c33e6-d6ec-4ee0-a457-0118aa208bbe
+    resourceVersion: "76634"
+    uid: bea51eb0-b445-4fd6-97f3-0726b17ce30d
+  spec:
+    podManagementPolicy: OrderedReady
+    replicas: 2
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app.kubernetes.io/instance: sh
+        app.kubernetes.io/managed-by: kubedb.com
+        app.kubernetes.io/name: mongodbs.kubedb.com
+        mongodb.kubedb.com/node.shard: sh-shard1
+    serviceName: sh-shard1-pods
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          app.kubernetes.io/component: database
+          app.kubernetes.io/instance: sh
+          app.kubernetes.io/managed-by: kubedb.com
+          app.kubernetes.io/name: mongodbs.kubedb.com
+          mongodb.kubedb.com/node.shard: sh-shard1
+      spec:
+        affinity:
+          podAntiAffinity:
+            preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/instance: sh
+                    app.kubernetes.io/managed-by: kubedb.com
+                    app.kubernetes.io/name: mongodbs.kubedb.com
+                    mongodb.kubedb.com/node.shard: sh-shard1
+                namespaces:
+                - demo
+                topologyKey: kubernetes.io/hostname
+              weight: 100
+            - podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/instance: sh
+                    app.kubernetes.io/managed-by: kubedb.com
+                    app.kubernetes.io/name: mongodbs.kubedb.com
+                    mongodb.kubedb.com/node.shard: sh-shard1
+                namespaces:
+                - demo
+                topologyKey: failure-domain.beta.kubernetes.io/zone
+              weight: 50
+        containers:
+        - args:
+          - --bind_ip_all
+          - --port=27017
+          - --clusterAuthMode=keyFile
+          - --keyFile=/data/configdb/key.txt
+          - --dbpath=/data/db
+          - --auth
+          - --shardsvr
+          - --replSet=shard1
+          - --ipv6
+          - --tlsMode=disabled
+          command:
+          - mongod
+          env:
+          - name: POD_NAMESPACE
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+          - name: REPLICA_SET
+            value: shard1
+          - name: AUTH
+            value: "true"
+          - name: SSL_MODE
+            value: disabled
+          - name: CLUSTER_AUTH_MODE
+            value: keyFile
+          - name: MONGO_INITDB_ROOT_USERNAME
+            valueFrom:
+              secretKeyRef:
+                key: username
+                name: sh-auth
+          - name: MONGO_INITDB_ROOT_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: password
+                name: sh-auth
+          - name: POD_NAME
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.name
+          image: mongo:4.2.3
+          imagePullPolicy: IfNotPresent
+          lifecycle:
+            postStart:
+              exec:
+                command:
+                - /bin/bash
+                - -c
+                - /init-scripts/peer-finder -on-start=/init-scripts/sharding.sh -service=sh-shard1-pods
+          livenessProbe:
+            exec:
+              command:
+              - bash
+              - -c
+              - "set -x; if [[ $(mongo admin --host=localhost  --username=$MONGO_INITDB_ROOT_USERNAME
+                --password=$MONGO_INITDB_ROOT_PASSWORD --authenticationDatabase=admin
+                --quiet --eval \"db.adminCommand('ping').ok\" ) -eq \"1\" ]]; then
+                \n          exit 0\n        fi\n        exit 1"
+            failureThreshold: 3
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+          name: mongodb
+          ports:
+          - containerPort: 27017
+            name: db
+            protocol: TCP
+          readinessProbe:
+            exec:
+              command:
+              - bash
+              - -c
+              - "set -x; if [[ $(mongo admin --host=localhost  --username=$MONGO_INITDB_ROOT_USERNAME
+                --password=$MONGO_INITDB_ROOT_PASSWORD --authenticationDatabase=admin
+                --quiet --eval \"db.adminCommand('ping').ok\" ) -eq \"1\" ]]; then
+                \n          exit 0\n        fi\n        exit 1"
+            failureThreshold: 3
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              memory: 100Mi
+            requests:
+              cpu: 100m
+              memory: 100Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /work-dir
+            name: workdir
+          - mountPath: /data/configdb
+            name: config
+          - mountPath: /init-scripts
+            name: init-scripts
+          - mountPath: /data/db
+            name: datadir
+        dnsPolicy: ClusterFirst
+        initContainers:
+        - args:
+          - -c
+          - "\n\t\t\techo \"running install.sh\"\n\t\t\t/scripts/install.sh"
+          command:
+          - /bin/sh
+          env:
+          - name: SSL_MODE
+            value: disabled
+          image: arnobkumarsaha/mongo-init-docker:_linux_amd64
+          imagePullPolicy: IfNotPresent
+          name: copy-config
+          resources:
+            limits:
+              memory: 100Mi
+            requests:
+              cpu: 100m
+              memory: 100Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /data/configdb
+            name: config
+          - mountPath: /init-scripts
+            name: init-scripts
+          - mountPath: /var/run/mongodb/tls
+            name: certdir
+          - mountPath: /keydir-readonly
+            name: keydir
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        serviceAccount: sh
+        serviceAccountName: sh
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - emptyDir: {}
+          name: config
+        - emptyDir: {}
+          name: init-scripts
+        - emptyDir: {}
+          name: certdir
+        - name: keydir
+          secret:
+            defaultMode: 256
+            secretName: sh-key
+        - emptyDir: {}
+          name: workdir
+    updateStrategy:
+      type: OnDelete
+    volumeClaimTemplates:
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        annotations:
+          volume.beta.kubernetes.io/storage-class: standard
+        creationTimestamp: null
+        name: datadir
+      spec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 100Mi
+        storageClassName: standard
+        volumeMode: Filesystem
+      status:
+        phase: Pending
+  status:
+    availableReplicas: 2
+    collisionCount: 0
+    currentReplicas: 2
+    currentRevision: sh-shard1-68b759fd77
+    observedGeneration: 1
+    readyReplicas: 2
+    replicas: 2
+    updateRevision: sh-shard1-68b759fd77
+    updatedReplicas: 2
+- apiVersion: apps/v1
+  kind: StatefulSet
+  metadata:
+    creationTimestamp: "2022-08-23T05:33:21Z"
+    generation: 1
+    labels:
+      app.kubernetes.io/component: database
+      app.kubernetes.io/instance: sh
+      app.kubernetes.io/managed-by: kubedb.com
+      app.kubernetes.io/name: mongodbs.kubedb.com
+      mongodb.kubedb.com/node.shard: sh-shard2
+    name: sh-shard2
+    namespace: demo
+    ownerReferences:
+    - apiVersion: kubedb.com/v1alpha2
+      blockOwnerDeletion: true
+      controller: true
+      kind: MongoDB
+      name: sh
+      uid: e54c33e6-d6ec-4ee0-a457-0118aa208bbe
+    resourceVersion: "76657"
+    uid: 65b25fdc-809d-427a-87eb-26b0cdc23fed
+  spec:
+    podManagementPolicy: OrderedReady
+    replicas: 2
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app.kubernetes.io/instance: sh
+        app.kubernetes.io/managed-by: kubedb.com
+        app.kubernetes.io/name: mongodbs.kubedb.com
+        mongodb.kubedb.com/node.shard: sh-shard2
+    serviceName: sh-shard2-pods
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          app.kubernetes.io/component: database
+          app.kubernetes.io/instance: sh
+          app.kubernetes.io/managed-by: kubedb.com
+          app.kubernetes.io/name: mongodbs.kubedb.com
+          mongodb.kubedb.com/node.shard: sh-shard2
+      spec:
+        affinity:
+          podAntiAffinity:
+            preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/instance: sh
+                    app.kubernetes.io/managed-by: kubedb.com
+                    app.kubernetes.io/name: mongodbs.kubedb.com
+                    mongodb.kubedb.com/node.shard: sh-shard2
+                namespaces:
+                - demo
+                topologyKey: kubernetes.io/hostname
+              weight: 100
+            - podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/instance: sh
+                    app.kubernetes.io/managed-by: kubedb.com
+                    app.kubernetes.io/name: mongodbs.kubedb.com
+                    mongodb.kubedb.com/node.shard: sh-shard2
+                namespaces:
+                - demo
+                topologyKey: failure-domain.beta.kubernetes.io/zone
+              weight: 50
+        containers:
+        - args:
+          - --bind_ip_all
+          - --port=27017
+          - --clusterAuthMode=keyFile
+          - --keyFile=/data/configdb/key.txt
+          - --dbpath=/data/db
+          - --auth
+          - --shardsvr
+          - --replSet=shard2
+          - --ipv6
+          - --tlsMode=disabled
+          command:
+          - mongod
+          env:
+          - name: POD_NAMESPACE
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+          - name: REPLICA_SET
+            value: shard2
+          - name: AUTH
+            value: "true"
+          - name: SSL_MODE
+            value: disabled
+          - name: CLUSTER_AUTH_MODE
+            value: keyFile
+          - name: MONGO_INITDB_ROOT_USERNAME
+            valueFrom:
+              secretKeyRef:
+                key: username
+                name: sh-auth
+          - name: MONGO_INITDB_ROOT_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: password
+                name: sh-auth
+          - name: POD_NAME
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.name
+          image: mongo:4.2.3
+          imagePullPolicy: IfNotPresent
+          lifecycle:
+            postStart:
+              exec:
+                command:
+                - /bin/bash
+                - -c
+                - /init-scripts/peer-finder -on-start=/init-scripts/sharding.sh -service=sh-shard2-pods
+          livenessProbe:
+            exec:
+              command:
+              - bash
+              - -c
+              - "set -x; if [[ $(mongo admin --host=localhost  --username=$MONGO_INITDB_ROOT_USERNAME
+                --password=$MONGO_INITDB_ROOT_PASSWORD --authenticationDatabase=admin
+                --quiet --eval \"db.adminCommand('ping').ok\" ) -eq \"1\" ]]; then
+                \n          exit 0\n        fi\n        exit 1"
+            failureThreshold: 3
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+          name: mongodb
+          ports:
+          - containerPort: 27017
+            name: db
+            protocol: TCP
+          readinessProbe:
+            exec:
+              command:
+              - bash
+              - -c
+              - "set -x; if [[ $(mongo admin --host=localhost  --username=$MONGO_INITDB_ROOT_USERNAME
+                --password=$MONGO_INITDB_ROOT_PASSWORD --authenticationDatabase=admin
+                --quiet --eval \"db.adminCommand('ping').ok\" ) -eq \"1\" ]]; then
+                \n          exit 0\n        fi\n        exit 1"
+            failureThreshold: 3
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              memory: 100Mi
+            requests:
+              cpu: 100m
+              memory: 100Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /work-dir
+            name: workdir
+          - mountPath: /data/configdb
+            name: config
+          - mountPath: /init-scripts
+            name: init-scripts
+          - mountPath: /data/db
+            name: datadir
+        dnsPolicy: ClusterFirst
+        initContainers:
+        - args:
+          - -c
+          - "\n\t\t\techo \"running install.sh\"\n\t\t\t/scripts/install.sh"
+          command:
+          - /bin/sh
+          env:
+          - name: SSL_MODE
+            value: disabled
+          image: arnobkumarsaha/mongo-init-docker:_linux_amd64
+          imagePullPolicy: IfNotPresent
+          name: copy-config
+          resources:
+            limits:
+              memory: 100Mi
+            requests:
+              cpu: 100m
+              memory: 100Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /data/configdb
+            name: config
+          - mountPath: /init-scripts
+            name: init-scripts
+          - mountPath: /var/run/mongodb/tls
+            name: certdir
+          - mountPath: /keydir-readonly
+            name: keydir
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        serviceAccount: sh
+        serviceAccountName: sh
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - emptyDir: {}
+          name: config
+        - emptyDir: {}
+          name: init-scripts
+        - emptyDir: {}
+          name: certdir
+        - name: keydir
+          secret:
+            defaultMode: 256
+            secretName: sh-key
+        - emptyDir: {}
+          name: workdir
+    updateStrategy:
+      type: OnDelete
+    volumeClaimTemplates:
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        annotations:
+          volume.beta.kubernetes.io/storage-class: standard
+        creationTimestamp: null
+        name: datadir
+      spec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 100Mi
+        storageClassName: standard
+        volumeMode: Filesystem
+      status:
+        phase: Pending
+  status:
+    availableReplicas: 2
+    collisionCount: 0
+    currentReplicas: 2
+    currentRevision: sh-shard2-856bb48f59
+    observedGeneration: 1
+    readyReplicas: 2
+    replicas: 2
+    updateRevision: sh-shard2-856bb48f59
+    updatedReplicas: 2
+- apiVersion: apps/v1
+  kind: StatefulSet
+  metadata:
+    creationTimestamp: "2022-08-23T05:33:22Z"
+    generation: 1
+    labels:
+      app.kubernetes.io/component: database
+      app.kubernetes.io/instance: sh
+      app.kubernetes.io/managed-by: kubedb.com
+      app.kubernetes.io/name: mongodbs.kubedb.com
+      mongodb.kubedb.com/node.shard: sh-shard3
+    name: sh-shard3
+    namespace: demo
+    ownerReferences:
+    - apiVersion: kubedb.com/v1alpha2
+      blockOwnerDeletion: true
+      controller: true
+      kind: MongoDB
+      name: sh
+      uid: e54c33e6-d6ec-4ee0-a457-0118aa208bbe
+    resourceVersion: "76363"
+    uid: bb670f20-56fa-4906-b33a-791e02a0ff35
+  spec:
+    podManagementPolicy: OrderedReady
+    replicas: 2
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app.kubernetes.io/instance: sh
+        app.kubernetes.io/managed-by: kubedb.com
+        app.kubernetes.io/name: mongodbs.kubedb.com
+        mongodb.kubedb.com/node.shard: sh-shard3
+    serviceName: sh-shard3-pods
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          app.kubernetes.io/component: database
+          app.kubernetes.io/instance: sh
+          app.kubernetes.io/managed-by: kubedb.com
+          app.kubernetes.io/name: mongodbs.kubedb.com
+          mongodb.kubedb.com/node.shard: sh-shard3
+      spec:
+        affinity:
+          podAntiAffinity:
+            preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/instance: sh
+                    app.kubernetes.io/managed-by: kubedb.com
+                    app.kubernetes.io/name: mongodbs.kubedb.com
+                    mongodb.kubedb.com/node.shard: sh-shard3
+                namespaces:
+                - demo
+                topologyKey: kubernetes.io/hostname
+              weight: 100
+            - podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/instance: sh
+                    app.kubernetes.io/managed-by: kubedb.com
+                    app.kubernetes.io/name: mongodbs.kubedb.com
+                    mongodb.kubedb.com/node.shard: sh-shard3
+                namespaces:
+                - demo
+                topologyKey: failure-domain.beta.kubernetes.io/zone
+              weight: 50
+        containers:
+        - args:
+          - --bind_ip_all
+          - --port=27017
+          - --clusterAuthMode=keyFile
+          - --keyFile=/data/configdb/key.txt
+          - --dbpath=/data/db
+          - --auth
+          - --shardsvr
+          - --replSet=shard3
+          - --ipv6
+          - --tlsMode=disabled
+          command:
+          - mongod
+          env:
+          - name: POD_NAMESPACE
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+          - name: REPLICA_SET
+            value: shard3
+          - name: AUTH
+            value: "true"
+          - name: SSL_MODE
+            value: disabled
+          - name: CLUSTER_AUTH_MODE
+            value: keyFile
+          - name: MONGO_INITDB_ROOT_USERNAME
+            valueFrom:
+              secretKeyRef:
+                key: username
+                name: sh-auth
+          - name: MONGO_INITDB_ROOT_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: password
+                name: sh-auth
+          - name: POD_NAME
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.name
+          image: mongo:4.2.3
+          imagePullPolicy: IfNotPresent
+          lifecycle:
+            postStart:
+              exec:
+                command:
+                - /bin/bash
+                - -c
+                - /init-scripts/peer-finder -on-start=/init-scripts/sharding.sh -service=sh-shard3-pods
+          livenessProbe:
+            exec:
+              command:
+              - bash
+              - -c
+              - "set -x; if [[ $(mongo admin --host=localhost  --username=$MONGO_INITDB_ROOT_USERNAME
+                --password=$MONGO_INITDB_ROOT_PASSWORD --authenticationDatabase=admin
+                --quiet --eval \"db.adminCommand('ping').ok\" ) -eq \"1\" ]]; then
+                \n          exit 0\n        fi\n        exit 1"
+            failureThreshold: 3
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+          name: mongodb
+          ports:
+          - containerPort: 27017
+            name: db
+            protocol: TCP
+          readinessProbe:
+            exec:
+              command:
+              - bash
+              - -c
+              - "set -x; if [[ $(mongo admin --host=localhost  --username=$MONGO_INITDB_ROOT_USERNAME
+                --password=$MONGO_INITDB_ROOT_PASSWORD --authenticationDatabase=admin
+                --quiet --eval \"db.adminCommand('ping').ok\" ) -eq \"1\" ]]; then
+                \n          exit 0\n        fi\n        exit 1"
+            failureThreshold: 3
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              memory: 100Mi
+            requests:
+              cpu: 100m
+              memory: 100Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /work-dir
+            name: workdir
+          - mountPath: /data/configdb
+            name: config
+          - mountPath: /init-scripts
+            name: init-scripts
+          - mountPath: /data/db
+            name: datadir
+        dnsPolicy: ClusterFirst
+        initContainers:
+        - args:
+          - -c
+          - "\n\t\t\techo \"running install.sh\"\n\t\t\t/scripts/install.sh"
+          command:
+          - /bin/sh
+          env:
+          - name: SSL_MODE
+            value: disabled
+          image: arnobkumarsaha/mongo-init-docker:_linux_amd64
+          imagePullPolicy: IfNotPresent
+          name: copy-config
+          resources:
+            limits:
+              memory: 100Mi
+            requests:
+              cpu: 100m
+              memory: 100Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /data/configdb
+            name: config
+          - mountPath: /init-scripts
+            name: init-scripts
+          - mountPath: /var/run/mongodb/tls
+            name: certdir
+          - mountPath: /keydir-readonly
+            name: keydir
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        serviceAccount: sh
+        serviceAccountName: sh
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - emptyDir: {}
+          name: config
+        - emptyDir: {}
+          name: init-scripts
+        - emptyDir: {}
+          name: certdir
+        - name: keydir
+          secret:
+            defaultMode: 256
+            secretName: sh-key
+        - emptyDir: {}
+          name: workdir
+    updateStrategy:
+      type: OnDelete
+    volumeClaimTemplates:
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        annotations:
+          volume.beta.kubernetes.io/storage-class: standard
+        creationTimestamp: null
+        name: datadir
+      spec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 100Mi
+        storageClassName: standard
+        volumeMode: Filesystem
+      status:
+        phase: Pending
+  status:
+    availableReplicas: 2
+    collisionCount: 0
+    currentReplicas: 2
+    currentRevision: sh-shard3-58dfdf46bf
+    observedGeneration: 1
+    readyReplicas: 2
+    replicas: 2
+    updateRevision: sh-shard3-58dfdf46bf
+    updatedReplicas: 2
+- apiVersion: apps/v1
+  kind: StatefulSet
+  metadata:
+    creationTimestamp: "2022-08-23T05:33:22Z"
+    generation: 1
+    labels:
+      app.kubernetes.io/component: database
+      app.kubernetes.io/instance: sh
+      app.kubernetes.io/managed-by: kubedb.com
+      app.kubernetes.io/name: mongodbs.kubedb.com
+      mongodb.kubedb.com/node.shard: sh-shard4
+    name: sh-shard4
+    namespace: demo
+    ownerReferences:
+    - apiVersion: kubedb.com/v1alpha2
+      blockOwnerDeletion: true
+      controller: true
+      kind: MongoDB
+      name: sh
+      uid: e54c33e6-d6ec-4ee0-a457-0118aa208bbe
+    resourceVersion: "76485"
+    uid: 42b3f469-8f44-450d-8d50-e55e8c9dd502
+  spec:
+    podManagementPolicy: OrderedReady
+    replicas: 2
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app.kubernetes.io/instance: sh
+        app.kubernetes.io/managed-by: kubedb.com
+        app.kubernetes.io/name: mongodbs.kubedb.com
+        mongodb.kubedb.com/node.shard: sh-shard4
+    serviceName: sh-shard4-pods
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          app.kubernetes.io/component: database
+          app.kubernetes.io/instance: sh
+          app.kubernetes.io/managed-by: kubedb.com
+          app.kubernetes.io/name: mongodbs.kubedb.com
+          mongodb.kubedb.com/node.shard: sh-shard4
+      spec:
+        affinity:
+          podAntiAffinity:
+            preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/instance: sh
+                    app.kubernetes.io/managed-by: kubedb.com
+                    app.kubernetes.io/name: mongodbs.kubedb.com
+                    mongodb.kubedb.com/node.shard: sh-shard4
+                namespaces:
+                - demo
+                topologyKey: kubernetes.io/hostname
+              weight: 100
+            - podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/instance: sh
+                    app.kubernetes.io/managed-by: kubedb.com
+                    app.kubernetes.io/name: mongodbs.kubedb.com
+                    mongodb.kubedb.com/node.shard: sh-shard4
+                namespaces:
+                - demo
+                topologyKey: failure-domain.beta.kubernetes.io/zone
+              weight: 50
+        containers:
+        - args:
+          - --bind_ip_all
+          - --port=27017
+          - --clusterAuthMode=keyFile
+          - --keyFile=/data/configdb/key.txt
+          - --dbpath=/data/db
+          - --auth
+          - --shardsvr
+          - --replSet=shard4
+          - --ipv6
+          - --tlsMode=disabled
+          command:
+          - mongod
+          env:
+          - name: POD_NAMESPACE
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+          - name: REPLICA_SET
+            value: shard4
+          - name: AUTH
+            value: "true"
+          - name: SSL_MODE
+            value: disabled
+          - name: CLUSTER_AUTH_MODE
+            value: keyFile
+          - name: MONGO_INITDB_ROOT_USERNAME
+            valueFrom:
+              secretKeyRef:
+                key: username
+                name: sh-auth
+          - name: MONGO_INITDB_ROOT_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: password
+                name: sh-auth
+          - name: POD_NAME
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.name
+          image: mongo:4.2.3
+          imagePullPolicy: IfNotPresent
+          lifecycle:
+            postStart:
+              exec:
+                command:
+                - /bin/bash
+                - -c
+                - /init-scripts/peer-finder -on-start=/init-scripts/sharding.sh -service=sh-shard4-pods
+          livenessProbe:
+            exec:
+              command:
+              - bash
+              - -c
+              - "set -x; if [[ $(mongo admin --host=localhost  --username=$MONGO_INITDB_ROOT_USERNAME
+                --password=$MONGO_INITDB_ROOT_PASSWORD --authenticationDatabase=admin
+                --quiet --eval \"db.adminCommand('ping').ok\" ) -eq \"1\" ]]; then
+                \n          exit 0\n        fi\n        exit 1"
+            failureThreshold: 3
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+          name: mongodb
+          ports:
+          - containerPort: 27017
+            name: db
+            protocol: TCP
+          readinessProbe:
+            exec:
+              command:
+              - bash
+              - -c
+              - "set -x; if [[ $(mongo admin --host=localhost  --username=$MONGO_INITDB_ROOT_USERNAME
+                --password=$MONGO_INITDB_ROOT_PASSWORD --authenticationDatabase=admin
+                --quiet --eval \"db.adminCommand('ping').ok\" ) -eq \"1\" ]]; then
+                \n          exit 0\n        fi\n        exit 1"
+            failureThreshold: 3
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              memory: 100Mi
+            requests:
+              cpu: 100m
+              memory: 100Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /work-dir
+            name: workdir
+          - mountPath: /data/configdb
+            name: config
+          - mountPath: /init-scripts
+            name: init-scripts
+          - mountPath: /data/db
+            name: datadir
+        dnsPolicy: ClusterFirst
+        initContainers:
+        - args:
+          - -c
+          - "\n\t\t\techo \"running install.sh\"\n\t\t\t/scripts/install.sh"
+          command:
+          - /bin/sh
+          env:
+          - name: SSL_MODE
+            value: disabled
+          image: arnobkumarsaha/mongo-init-docker:_linux_amd64
+          imagePullPolicy: IfNotPresent
+          name: copy-config
+          resources:
+            limits:
+              memory: 100Mi
+            requests:
+              cpu: 100m
+              memory: 100Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /data/configdb
+            name: config
+          - mountPath: /init-scripts
+            name: init-scripts
+          - mountPath: /var/run/mongodb/tls
+            name: certdir
+          - mountPath: /keydir-readonly
+            name: keydir
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        serviceAccount: sh
+        serviceAccountName: sh
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - emptyDir: {}
+          name: config
+        - emptyDir: {}
+          name: init-scripts
+        - emptyDir: {}
+          name: certdir
+        - name: keydir
+          secret:
+            defaultMode: 256
+            secretName: sh-key
+        - emptyDir: {}
+          name: workdir
+    updateStrategy:
+      type: OnDelete
+    volumeClaimTemplates:
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        annotations:
+          volume.beta.kubernetes.io/storage-class: standard
+        creationTimestamp: null
+        name: datadir
+      spec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 100Mi
+        storageClassName: standard
+        volumeMode: Filesystem
+      status:
+        phase: Pending
+  status:
+    availableReplicas: 2
+    collisionCount: 0
+    currentReplicas: 2
+    currentRevision: sh-shard4-b8bbdc999
+    observedGeneration: 1
+    readyReplicas: 2
+    replicas: 2
+    updateRevision: sh-shard4-b8bbdc999
+    updatedReplicas: 2
+kind: List
+metadata:
+  resourceVersion: ""

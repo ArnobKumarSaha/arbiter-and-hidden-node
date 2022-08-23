@@ -17,8 +17,8 @@ spec:
   # storageEngine: inMemory
   storageType: Durable
   storage:
-    # storageClassName: "longhorn"
-    storageClassName: linode-block-storage
+    storageClassName: "standard"
+    # storageClassName: linode-block-storage
     accessModes:
       - ReadWriteOnce
     resources:
@@ -31,13 +31,13 @@ spec:
   #     kind: Issuer
   #     name: mongo-ca-issuer
   # clusterAuthMode: x509
-  arbiter:
-    podTemplate:
-      spec:
-        resources:
-          requests:
-            cpu: "150m"
-            memory: "150Mi"
+  # arbiter:
+  #   podTemplate:
+  #     spec:
+  #       resources:
+  #         requests:
+  #           cpu: "150m"
+  #           memory: "150Mi"
   hidden:
     podTemplate:
       spec:
@@ -47,8 +47,8 @@ spec:
             memory: "200Mi"
     replicas: 2
     storage:
-      # storageClassName: "longhorn"
-      storageClassName: linode-block-storage
+      storageClassName: "standard"
+      # storageClassName: linode-block-storage
       accessModes:
         - ReadWriteOnce
       resources:

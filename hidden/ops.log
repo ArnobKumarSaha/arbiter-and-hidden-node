@@ -1,0 +1,112 @@
+I0822 11:24:12.647113       1 mongodb_ops_request.go:65] MongoDBOpsRequest "msg"="Started processing MongoDBOpsRequest" "key"="demo/horizontal"
+I0822 11:24:12.725800       1 mongodb_ops_request.go:65] MongoDBOpsRequest "msg"="Started processing MongoDBOpsRequest" "key"="demo/horizontal"
+I0822 11:24:21.612085       1 statefulset.go:81] Patching StatefulSet demo/sh-configsvr with {"spec":{"template":{"spec":{"$setElementOrder/containers":[{"name":"mongodb"}],"$setElementOrder/initContainers":[{"name":"copy-config"}],"containers":[{"image":"mongo:4.2.3@sha256:58b25d51baa11a85b6aedf7c4e05710d12a27ddc2883e2692e7d58527d98bd73","name":"mongodb"}],"initContainers":[{"image":"arnobkumarsaha/mongo-init-docker:_linux_amd64@sha256:6954b117b6f7b74ec417f046c15e4fcfa2ce7931bb7ad34587c7b12b6d91a561","name":"copy-config"}]}}}}.
+I0822 11:24:21.617466       1 warning_handler.go:65] KubeAPIWarningLogger "msg"="policy/v1beta1 PodDisruptionBudget is deprecated in v1.21+, unavailable in v1.25+; use policy/v1 PodDisruptionBudget" 
+I0822 11:24:25.361620       1 statefulset.go:81] Patching StatefulSet demo/sh-shard0 with {"spec":{"template":{"spec":{"$setElementOrder/containers":[{"name":"mongodb"}],"$setElementOrder/initContainers":[{"name":"copy-config"}],"containers":[{"image":"mongo:4.2.3@sha256:58b25d51baa11a85b6aedf7c4e05710d12a27ddc2883e2692e7d58527d98bd73","name":"mongodb"}],"initContainers":[{"image":"arnobkumarsaha/mongo-init-docker:_linux_amd64@sha256:6954b117b6f7b74ec417f046c15e4fcfa2ce7931bb7ad34587c7b12b6d91a561","name":"copy-config"}]}}}}.
+I0822 11:24:29.112068       1 statefulset.go:81] Patching StatefulSet demo/sh-shard0-arbiter with {"spec":{"template":{"spec":{"$setElementOrder/containers":[{"name":"mongodb"}],"$setElementOrder/initContainers":[{"name":"copy-config"}],"containers":[{"image":"mongo:4.2.3@sha256:58b25d51baa11a85b6aedf7c4e05710d12a27ddc2883e2692e7d58527d98bd73","name":"mongodb"}],"initContainers":[{"image":"arnobkumarsaha/mongo-init-docker:_linux_amd64@sha256:6954b117b6f7b74ec417f046c15e4fcfa2ce7931bb7ad34587c7b12b6d91a561","name":"copy-config"}]}}}}.
+I0822 11:24:32.793978       1 statefulset.go:81] Patching StatefulSet demo/sh-shard0-hidden with {"spec":{"template":{"spec":{"$setElementOrder/containers":[{"name":"mongodb"}],"$setElementOrder/initContainers":[{"name":"copy-config"}],"containers":[{"image":"mongo:4.2.3@sha256:58b25d51baa11a85b6aedf7c4e05710d12a27ddc2883e2692e7d58527d98bd73","name":"mongodb"}],"initContainers":[{"image":"arnobkumarsaha/mongo-init-docker:_linux_amd64@sha256:6954b117b6f7b74ec417f046c15e4fcfa2ce7931bb7ad34587c7b12b6d91a561","name":"copy-config"}]}}}}.
+I0822 11:24:36.507688       1 statefulset.go:81] Patching StatefulSet demo/sh-shard1 with {"spec":{"template":{"spec":{"$setElementOrder/containers":[{"name":"mongodb"}],"$setElementOrder/initContainers":[{"name":"copy-config"}],"containers":[{"image":"mongo:4.2.3@sha256:58b25d51baa11a85b6aedf7c4e05710d12a27ddc2883e2692e7d58527d98bd73","name":"mongodb"}],"initContainers":[{"image":"arnobkumarsaha/mongo-init-docker:_linux_amd64@sha256:6954b117b6f7b74ec417f046c15e4fcfa2ce7931bb7ad34587c7b12b6d91a561","name":"copy-config"}]}}}}.
+I0822 11:24:40.099647       1 statefulset.go:81] Patching StatefulSet demo/sh-shard1-arbiter with {"spec":{"template":{"spec":{"$setElementOrder/containers":[{"name":"mongodb"}],"$setElementOrder/initContainers":[{"name":"copy-config"}],"containers":[{"image":"mongo:4.2.3@sha256:58b25d51baa11a85b6aedf7c4e05710d12a27ddc2883e2692e7d58527d98bd73","name":"mongodb"}],"initContainers":[{"image":"arnobkumarsaha/mongo-init-docker:_linux_amd64@sha256:6954b117b6f7b74ec417f046c15e4fcfa2ce7931bb7ad34587c7b12b6d91a561","name":"copy-config"}]}}}}.
+I0822 11:24:43.838974       1 statefulset.go:81] Patching StatefulSet demo/sh-shard1-hidden with {"spec":{"template":{"spec":{"$setElementOrder/containers":[{"name":"mongodb"}],"$setElementOrder/initContainers":[{"name":"copy-config"}],"containers":[{"image":"mongo:4.2.3@sha256:58b25d51baa11a85b6aedf7c4e05710d12a27ddc2883e2692e7d58527d98bd73","name":"mongodb"}],"initContainers":[{"image":"arnobkumarsaha/mongo-init-docker:_linux_amd64@sha256:6954b117b6f7b74ec417f046c15e4fcfa2ce7931bb7ad34587c7b12b6d91a561","name":"copy-config"}]}}}}.
+I0822 11:24:47.614656       1 statefulset.go:81] Patching StatefulSet demo/sh-shard2 with {"spec":{"template":{"spec":{"$setElementOrder/containers":[{"name":"mongodb"}],"$setElementOrder/initContainers":[{"name":"copy-config"}],"containers":[{"image":"mongo:4.2.3@sha256:58b25d51baa11a85b6aedf7c4e05710d12a27ddc2883e2692e7d58527d98bd73","name":"mongodb"}],"initContainers":[{"image":"arnobkumarsaha/mongo-init-docker:_linux_amd64@sha256:6954b117b6f7b74ec417f046c15e4fcfa2ce7931bb7ad34587c7b12b6d91a561","name":"copy-config"}]}}}}.
+I0822 11:24:51.174294       1 statefulset.go:81] Patching StatefulSet demo/sh-shard2-arbiter with {"spec":{"template":{"spec":{"$setElementOrder/containers":[{"name":"mongodb"}],"$setElementOrder/initContainers":[{"name":"copy-config"}],"containers":[{"image":"mongo:4.2.3@sha256:58b25d51baa11a85b6aedf7c4e05710d12a27ddc2883e2692e7d58527d98bd73","name":"mongodb"}],"initContainers":[{"image":"arnobkumarsaha/mongo-init-docker:_linux_amd64@sha256:6954b117b6f7b74ec417f046c15e4fcfa2ce7931bb7ad34587c7b12b6d91a561","name":"copy-config"}]}}}}.
+I0822 11:24:54.760943       1 statefulset.go:81] Patching StatefulSet demo/sh-shard2-hidden with {"spec":{"template":{"spec":{"$setElementOrder/containers":[{"name":"mongodb"}],"$setElementOrder/initContainers":[{"name":"copy-config"}],"containers":[{"image":"mongo:4.2.3@sha256:58b25d51baa11a85b6aedf7c4e05710d12a27ddc2883e2692e7d58527d98bd73","name":"mongodb"}],"initContainers":[{"image":"arnobkumarsaha/mongo-init-docker:_linux_amd64@sha256:6954b117b6f7b74ec417f046c15e4fcfa2ce7931bb7ad34587c7b12b6d91a561","name":"copy-config"}]}}}}.
+I0822 11:24:59.261708       1 statefulset.go:81] Patching StatefulSet demo/sh-mongos with {"spec":{"template":{"spec":{"$setElementOrder/containers":[{"name":"mongodb"}],"$setElementOrder/initContainers":[{"name":"copy-config"},{"name":"bootstrap"}],"containers":[{"$setElementOrder/env":[{"name":"CONFIGDB_REPSET"},{"name":"SHARD_REPSETS"},{"name":"SERVICE_NAME"},{"name":"MONGO_INITDB_ROOT_USERNAME"},{"name":"MONGO_INITDB_ROOT_PASSWORD"},{"name":"POD_NAME"}],"env":[{"name":"SHARD_REPSETS","value":"shard0/sh-shard0-0.sh-shard0-pods.demo.svc:27017,sh-shard0-1.sh-shard0-pods.demo.svc:27017 shard1/sh-shard1-0.sh-shard1-pods.demo.svc:27017,sh-shard1-1.sh-shard1-pods.demo.svc:27017 shard2/sh-shard2-0.sh-shard2-pods.demo.svc:27017,sh-shard2-1.sh-shard2-pods.demo.svc:27017"}],"image":"mongo:4.2.3@sha256:58b25d51baa11a85b6aedf7c4e05710d12a27ddc2883e2692e7d58527d98bd73","name":"mongodb"}],"initContainers":[{"image":"arnobkumarsaha/mongo-init-docker:_linux_amd64@sha256:6954b117b6f7b74ec417f046c15e4fcfa2ce7931bb7ad34587c7b12b6d91a561","name":"copy-config"},{"$setElementOrder/env":[{"name":"AUTH"},{"name":"SSL_MODE"},{"name":"CLUSTER_AUTH_MODE"},{"name":"MONGO_INITDB_ROOT_USERNAME"},{"name":"MONGO_INITDB_ROOT_PASSWORD"},{"name":"CONFIGDB_REPSET"},{"name":"SHARD_REPSETS"},{"name":"SERVICE_NAME"}],"env":[{"name":"SHARD_REPSETS","value":"shard0/sh-shard0-0.sh-shard0-pods.demo.svc:27017,sh-shard0-1.sh-shard0-pods.demo.svc:27017 shard1/sh-shard1-0.sh-shard1-pods.demo.svc:27017,sh-shard1-1.sh-shard1-pods.demo.svc:27017 shard2/sh-shard2-0.sh-shard2-pods.demo.svc:27017,sh-shard2-1.sh-shard2-pods.demo.svc:27017"}],"image":"mongo:4.2.3@sha256:58b25d51baa11a85b6aedf7c4e05710d12a27ddc2883e2692e7d58527d98bd73","name":"bootstrap"}]}}}}.
+I0822 11:24:59.273105       1 appbinding.go:78] Patching AppBinding demo/sh with {"spec":{"parameters":{"replicaSets":{"host-3":null}}}}.
+I0822 11:24:59.277493       1 service.go:112] spec.monitor.agent is not provided by prometheus.io
+I0822 11:25:02.603017       1 version_manager.go:91] Containers images are not up-to-date for demo/sh
+I0822 11:25:02.603166       1 mongodb.go:309] Generated Version Upgrade Recommendation for demo/sh
+I0822 11:25:02.612659       1 reconcile.go:63] Get event for: demo/sh
+I0822 11:25:02.747328       1 statefulset.go:81] Patching StatefulSet demo/sh-shard3-arbiter with {"spec":{"replicas":0}}.
+I0822 11:25:02.781093       1 reconcile.go:63] Get event for: demo/sh
+I0822 11:25:03.843280       1 reconcile.go:63] Get event for: demo/sh
+I0822 11:25:03.874846       1 statefulset.go:81] Patching StatefulSet demo/sh-shard3-hidden with {"spec":{"replicas":0}}.
+I0822 11:25:03.908180       1 reconcile.go:63] Get event for: demo/sh
+I0822 11:25:04.817271       1 reconcile.go:63] Get event for: demo/sh
+I0822 11:25:04.843587       1 statefulset.go:81] Patching StatefulSet demo/sh-shard3 with {"spec":{"replicas":0}}.
+I0822 11:25:04.876219       1 reconcile.go:63] Get event for: demo/sh
+I0822 11:25:05.820001       1 reconcile.go:63] Get event for: demo/sh
+I0822 11:25:12.840969       1 reconcile.go:63] Get event for: demo/sh
+I0822 11:25:44.968506       1 statefulset.go:81] Patching StatefulSet demo/sh-mongos with {"spec":{"template":{"spec":{"$setElementOrder/containers":[{"name":"mongodb"}],"$setElementOrder/initContainers":[{"name":"copy-config"},{"name":"bootstrap"}],"containers":[{"$setElementOrder/env":[{"name":"CONFIGDB_REPSET"},{"name":"SHARD_REPSETS"},{"name":"SERVICE_NAME"},{"name":"MONGO_INITDB_ROOT_USERNAME"},{"name":"MONGO_INITDB_ROOT_PASSWORD"},{"name":"POD_NAME"}],"env":[{"name":"SHARD_REPSETS","value":"shard0/sh-shard0-0.sh-shard0-pods.demo.svc:27017,sh-shard0-1.sh-shard0-pods.demo.svc:27017 shard1/sh-shard1-0.sh-shard1-pods.demo.svc:27017,sh-shard1-1.sh-shard1-pods.demo.svc:27017"}],"name":"mongodb"}],"initContainers":[{"$setElementOrder/env":[{"name":"AUTH"},{"name":"SSL_MODE"},{"name":"CLUSTER_AUTH_MODE"},{"name":"MONGO_INITDB_ROOT_USERNAME"},{"name":"MONGO_INITDB_ROOT_PASSWORD"},{"name":"CONFIGDB_REPSET"},{"name":"SHARD_REPSETS"},{"name":"SERVICE_NAME"}],"env":[{"name":"SHARD_REPSETS","value":"shard0/sh-shard0-0.sh-shard0-pods.demo.svc:27017,sh-shard0-1.sh-shard0-pods.demo.svc:27017 shard1/sh-shard1-0.sh-shard1-pods.demo.svc:27017,sh-shard1-1.sh-shard1-pods.demo.svc:27017"}],"name":"bootstrap"}]}}}}.
+I0822 11:25:44.977703       1 appbinding.go:78] Patching AppBinding demo/sh with {"spec":{"parameters":{"replicaSets":{"host-2":null}}}}.
+I0822 11:25:44.981022       1 service.go:112] spec.monitor.agent is not provided by prometheus.io
+I0822 11:25:47.741069       1 horizontal_scaling_shard.go:405] shard3 shard has been removed completely.  Lets restart the mongos pods & delete PVCs
+I0822 11:25:47.743642       1 helpers.go:65] In Restart func    =>   sh-mongos-0 
+I0822 11:25:48.967204       1 reconcile.go:63] Get event for: demo/sh
+I0822 11:25:59.050136       1 reconcile.go:63] Get event for: demo/sh
+I0822 11:26:17.744382       1 horizontal_scaling_shard.go:405] shard3 shard has been removed completely.  Lets restart the mongos pods & delete PVCs
+I0822 11:26:17.747045       1 helpers.go:65] In Restart func    =>   sh-mongos-0 796c7a64-cbd7-4686-b4da-cc25151d4f8f
+I0822 11:26:17.748412       1 helpers.go:65] In Restart func    =>   sh-mongos-1 
+I0822 11:26:17.792145       1 horizontal_scaling_shard.go:405] shard3 shard has been removed completely.  Lets restart the mongos pods & delete PVCs
+I0822 11:26:17.797364       1 helpers.go:65] In Restart func    =>   sh-mongos-0 796c7a64-cbd7-4686-b4da-cc25151d4f8f
+I0822 11:26:17.801428       1 helpers.go:65] In Restart func    =>   sh-mongos-1 cb77aa9b-5dbf-44f0-aad3-e9f3b4466495
+I0822 11:26:19.059212       1 reconcile.go:63] Get event for: demo/sh
+I0822 11:26:22.750408       1 horizontal_scaling_shard.go:405] shard3 shard has been removed completely.  Lets restart the mongos pods & delete PVCs
+I0822 11:26:22.752968       1 helpers.go:65] In Restart func    =>   sh-mongos-0 796c7a64-cbd7-4686-b4da-cc25151d4f8f
+I0822 11:26:22.754390       1 helpers.go:65] In Restart func    =>   sh-mongos-1 cb77aa9b-5dbf-44f0-aad3-e9f3b4466495
+I0822 11:26:27.741981       1 horizontal_scaling_shard.go:405] shard3 shard has been removed completely.  Lets restart the mongos pods & delete PVCs
+I0822 11:26:27.744461       1 helpers.go:65] In Restart func    =>   sh-mongos-0 796c7a64-cbd7-4686-b4da-cc25151d4f8f
+I0822 11:26:27.748536       1 helpers.go:65] In Restart func    =>   sh-mongos-1 cb77aa9b-5dbf-44f0-aad3-e9f3b4466495
+I0822 11:26:29.166141       1 reconcile.go:63] Get event for: demo/sh
+I0822 11:26:32.755572       1 horizontal_scaling_shard.go:405] shard3 shard has been removed completely.  Lets restart the mongos pods & delete PVCs
+I0822 11:26:32.758151       1 helpers.go:65] In Restart func    =>   sh-mongos-0 796c7a64-cbd7-4686-b4da-cc25151d4f8f
+I0822 11:26:32.759470       1 helpers.go:65] In Restart func    =>   sh-mongos-1 cb77aa9b-5dbf-44f0-aad3-e9f3b4466495
+I0822 11:26:37.740316       1 horizontal_scaling_shard.go:405] shard3 shard has been removed completely.  Lets restart the mongos pods & delete PVCs
+I0822 11:26:37.742958       1 helpers.go:65] In Restart func    =>   sh-mongos-0 796c7a64-cbd7-4686-b4da-cc25151d4f8f
+I0822 11:26:37.744441       1 helpers.go:65] In Restart func    =>   sh-mongos-1 cb77aa9b-5dbf-44f0-aad3-e9f3b4466495
+I0822 11:26:42.738054       1 horizontal_scaling_shard.go:405] shard3 shard has been removed completely.  Lets restart the mongos pods & delete PVCs
+I0822 11:26:42.740559       1 helpers.go:65] In Restart func    =>   sh-mongos-0 796c7a64-cbd7-4686-b4da-cc25151d4f8f
+I0822 11:26:42.741993       1 helpers.go:65] In Restart func    =>   sh-mongos-1 cb77aa9b-5dbf-44f0-aad3-e9f3b4466495
+I0822 11:26:42.755370       1 statefulset.go:81] Patching StatefulSet demo/sh-shard2-arbiter with {"spec":{"replicas":0}}.
+I0822 11:26:42.776862       1 reconcile.go:63] Get event for: demo/sh
+I0822 11:26:43.126441       1 reconcile.go:63] Get event for: demo/sh
+I0822 11:26:43.127401       1 statefulset.go:81] Patching StatefulSet demo/sh-shard2-hidden with {"spec":{"replicas":0}}.
+I0822 11:26:43.160054       1 reconcile.go:63] Get event for: demo/sh
+I0822 11:26:44.163386       1 reconcile.go:63] Get event for: demo/sh
+I0822 11:26:44.193062       1 statefulset.go:81] Patching StatefulSet demo/sh-shard2 with {"spec":{"replicas":0}}.
+I0822 11:26:44.219535       1 reconcile.go:63] Get event for: demo/sh
+I0822 11:26:45.133480       1 reconcile.go:63] Get event for: demo/sh
+I0822 11:26:46.135745       1 reconcile.go:63] Get event for: demo/sh
+I0822 11:26:47.748269       1 horizontal_scaling_shard.go:405] shard3 shard has been removed completely.  Lets restart the mongos pods & delete PVCs
+I0822 11:26:47.750645       1 helpers.go:65] In Restart func    =>   sh-mongos-0 796c7a64-cbd7-4686-b4da-cc25151d4f8f
+I0822 11:26:47.752004       1 helpers.go:65] In Restart func    =>   sh-mongos-1 cb77aa9b-5dbf-44f0-aad3-e9f3b4466495
+I0822 11:26:52.741392       1 horizontal_scaling_shard.go:405] shard3 shard has been removed completely.  Lets restart the mongos pods & delete PVCs
+I0822 11:26:52.743778       1 helpers.go:65] In Restart func    =>   sh-mongos-0 796c7a64-cbd7-4686-b4da-cc25151d4f8f
+I0822 11:26:52.745042       1 helpers.go:65] In Restart func    =>   sh-mongos-1 cb77aa9b-5dbf-44f0-aad3-e9f3b4466495
+I0822 11:26:52.749721       1 horizontal_scaling_shard.go:405] shard2 shard has been removed completely.  Lets restart the mongos pods & delete PVCs
+I0822 11:26:52.751902       1 helpers.go:65] In Restart func    =>   sh-mongos-0 796c7a64-cbd7-4686-b4da-cc25151d4f8f
+I0822 11:26:52.753281       1 helpers.go:65] In Restart func    =>   sh-mongos-1 cb77aa9b-5dbf-44f0-aad3-e9f3b4466495
+I0822 11:26:57.743710       1 horizontal_scaling_shard.go:405] shard3 shard has been removed completely.  Lets restart the mongos pods & delete PVCs
+I0822 11:26:57.745971       1 helpers.go:65] In Restart func    =>   sh-mongos-0 796c7a64-cbd7-4686-b4da-cc25151d4f8f
+I0822 11:26:57.747373       1 helpers.go:65] In Restart func    =>   sh-mongos-1 cb77aa9b-5dbf-44f0-aad3-e9f3b4466495
+I0822 11:26:57.756040       1 horizontal_scaling_shard.go:405] shard2 shard has been removed completely.  Lets restart the mongos pods & delete PVCs
+I0822 11:26:57.759109       1 helpers.go:65] In Restart func    =>   sh-mongos-0 796c7a64-cbd7-4686-b4da-cc25151d4f8f
+I0822 11:26:57.760718       1 helpers.go:65] In Restart func    =>   sh-mongos-1 cb77aa9b-5dbf-44f0-aad3-e9f3b4466495
+I0822 11:27:02.739130       1 horizontal_scaling_shard.go:405] shard3 shard has been removed completely.  Lets restart the mongos pods & delete PVCs
+I0822 11:27:02.741345       1 helpers.go:65] In Restart func    =>   sh-mongos-0 796c7a64-cbd7-4686-b4da-cc25151d4f8f
+I0822 11:27:02.742731       1 helpers.go:65] In Restart func    =>   sh-mongos-1 cb77aa9b-5dbf-44f0-aad3-e9f3b4466495
+I0822 11:27:02.747575       1 horizontal_scaling_shard.go:405] shard2 shard has been removed completely.  Lets restart the mongos pods & delete PVCs
+I0822 11:27:02.749792       1 helpers.go:65] In Restart func    =>   sh-mongos-0 796c7a64-cbd7-4686-b4da-cc25151d4f8f
+I0822 11:27:02.751231       1 helpers.go:65] In Restart func    =>   sh-mongos-1 cb77aa9b-5dbf-44f0-aad3-e9f3b4466495
+I0822 11:27:02.776546       1 mongodb_ops_request.go:65] MongoDBOpsRequest "msg"="Started processing MongoDBOpsRequest" "key"="demo/horizontal"
+I0822 11:27:02.791071       1 reconcile.go:63] Get event for: demo/sh
+I0822 11:27:02.794021       1 mongodb.go:78] Patching MongoDB demo/sh with {"spec":{"shardTopology":{"shard":{"shards":2}}}}.
+I0822 11:27:02.805707       1 reconcile.go:63] Get event for: demo/sh
+I0822 11:27:02.806187       1 version_manager.go:72] Skipped same version upgrade checking, database has progressing OpsRequest
+I0822 11:27:02.839376       1 reconcile.go:63] Get event for: demo/sh
+I0822 11:27:02.839664       1 mongodb.go:35] started processing, key: demo/sh
+I0822 11:27:02.840057       1 version_manager.go:72] Skipped same version upgrade checking, database has progressing OpsRequest
+I0822 11:27:02.850047       1 mongodb.go:35] started processing, key: demo/sh
+I0822 11:27:02.850298       1 reconcile.go:63] Get event for: demo/sh
+I0822 11:27:02.850994       1 version_manager.go:72] Skipped same version upgrade checking, database has progressing OpsRequest
+I0822 11:27:02.854309       1 mongodb_ops_request.go:65] MongoDBOpsRequest "msg"="Started processing MongoDBOpsRequest" "key"="demo/horizontal"
+I0822 11:27:08.861969       1 reconcile.go:63] Get event for: demo/sh
+I0822 11:27:08.862012       1 mongodb.go:35] started processing, key: demo/sh
+
+
+
+
+
+
+
+-------------------------------------------- More Log --------------------------------------------------

@@ -1,22 +1,30 @@
 apiVersion: v1
 data:
-  mongod.conf: bmV0OgogICBtYXhJbmNvbWluZ0Nvbm5lY3Rpb25zOiAxMDAwMAo=
+  mongod.conf: bmV0OgogICBtYXhJbmNvbWluZ0Nvbm5lY3Rpb25zOiAxMDAwMQo=
 kind: Secret
 metadata:
-  name: prev-conf
+  name: rconf
   namespace: demo
 type: Opaque
 
 ---
 apiVersion: v1
 data:
-  mongod.conf: bmV0OgogICBtYXhJbmNvbWluZ0Nvbm5lY3Rpb25zOiAyMDAwMAo=
+  mongod.conf: bmV0OgogICBtYXhJbmNvbWluZ0Nvbm5lY3Rpb25zOiAxMDAwMgo=
 kind: Secret
 metadata:
-  name: new-conf
+  name: aconf
   namespace: demo
 type: Opaque
-
+---
+apiVersion: v1
+data:
+  mongod.conf: bmV0OgogICBtYXhJbmNvbWluZ0Nvbm5lY3Rpb25zOiAxMDAwMwo=
+kind: Secret
+metadata:
+  name: hconf
+  namespace: demo
+type: Opaque
 ---
 # apiVersion: kubedb.com/v1alpha2
 # kind: MongoDB

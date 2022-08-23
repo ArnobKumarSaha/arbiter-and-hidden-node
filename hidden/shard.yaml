@@ -4,7 +4,7 @@ metadata:
   name: sh
   namespace: demo
 spec:
-  version: "4.4.6"
+  version: "4.2.3"
   # storageEngine: inMemory
   shardTopology:
     configServer:
@@ -52,11 +52,21 @@ spec:
   #     name: mongo-ca-issuer
   # clusterAuthMode: x509
   terminationPolicy: WipeOut
-  # arbiter:
-  #   podTemplate: null
+  arbiter:
+    podTemplate:
+      spec:
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "100Mi"
   hidden:
-    podTemplate: {}
-    replicas: 2
+    podTemplate:
+      spec:
+        resources:
+          requests:
+            cpu: "200m"
+            memory: "200Mi"
+    replicas: 1
     storage:
       storageClassName: "standard"
       accessModes:

@@ -6,14 +6,17 @@ metadata:
 spec:
   type: Reconfigure
   databaseRef:
-    name: mongo
+    name: sh
   configuration:
-    replicaSet:
-      configSecret:
-        name: new-conf
+    # replicaSet:
+    #   configSecret:
+    #     name: new-conf
     arbiter:
       configSecret:
-        name: new-conf
+        name: aconf
     hidden:
       configSecret:
-        name: prev-conf
+        name: hconf
+    shard:
+      configSecret:
+        name: rconf
