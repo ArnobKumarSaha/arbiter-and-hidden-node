@@ -1,0 +1,6 @@
+
+mongo --ipv6 --host localhost --tls --tlsCAFile /var/run/mongodb/tls/ca.crt --tlsCertificateKeyFile /var/run/mongodb/tls/mongo.pem -u root -p "$MONGO_INITDB_ROOT_PASSWORD"
+
+
+kubectl create secret generic -n demo connection-conf --from-file=mongod.conf=./connection-conf
+kubectl create secret generic -n demo log-conf --from-file=mongod.conf=./log-conf
