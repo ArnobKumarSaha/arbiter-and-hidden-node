@@ -21,7 +21,7 @@ spec:
             storage: 100Mi
         storageClassName: standard
     mongos:
-      replicas: 2
+      replicas: 3 #2
       podTemplate:
         spec:
           resources:

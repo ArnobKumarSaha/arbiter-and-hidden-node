@@ -1,22 +1,19 @@
 
 #!/bin/bash
 
-my_hostname=sh-shard0-hidden-2
-HIDDEN_REPLICA_COUNT=4
-GOVERNING_SERVICE_NAME=gvgv
-POD_NAMESPACE=ns
+# my_hostname=sh-shard0-hidden-2
+# HIDDEN_REPLICA_COUNT=4
+# GOVERNING_SERVICE_NAME=gvgv
+# POD_NAMESPACE=ns
 
-for (( c=1; c<=$HIDDEN_REPLICA_COUNT; c++ )); do
-    cur_host=$(echo $my_hostname | sed -e "s/[-][0-9]*$/-${c}.${GOVERNING_SERVICE_NAME}.${POD_NAMESPACE}.svc/") 
-    echo $c $cur_host
-done
+# for (( c=1; c<=$HIDDEN_REPLICA_COUNT; c++ )); do
+#     cur_host=$(echo $my_hostname | sed -e "s/[-][0-9]*$/-${c}.${GOVERNING_SERVICE_NAME}.${POD_NAMESPACE}.svc/") 
+#     echo $c $cur_host
+# done
 
-exit 0
+# exit 0
 
 conf=$(cat actual.conf)
-#conf=$(cat modified.conf)
-
-
 echo "$conf" > conf.json
 
 for var in "NumberLong" "ObjectId";do 

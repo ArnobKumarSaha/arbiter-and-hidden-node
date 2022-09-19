@@ -6,20 +6,40 @@ metadata:
 spec:
   type: VerticalScaling
   databaseRef:
-    name: mongo
+    name: sh
   verticalScaling:
-    replicaSet:
+    shard:
       requests:
-        memory: "300Mi"
-        cpu: "300m"
+        memory: "444Mi"
+        cpu: "444m"
     arbiter:
       requests:
-        memory: "250Mi"
-        cpu: "250m"
-  configuration:
-    replicaSet:
-      configSecret:
-        name: prev-conf
-    arbiter:
-      configSecret:
-        name: new-conf
+        memory: "222Mi"
+        cpu: "222m"
+    configServer:
+      requests:
+        memory: "111Mi"
+        cpu: "111m"
+    hidden:
+      requests:
+        memory: "333Mi"
+        cpu: "333m"
+  # configuration:
+  #   replicaSet:
+  #     configSecret:
+  #       name: prev-conf
+  #   arbiter:
+  #     configSecret:
+  #       name: new-conf
+
+
+
+# Test Vertical Scaling
+# [Fail] Vertical Scaling Without Custom Config Scaling Arbiter Resources [It] Should Scale Arbiter Resources 
+# /home/arnob/go/src/kubedb.dev/tests/e2e/mongodb/lib.go:145
+
+# [Fail] Vertical Scaling with arbiter With Custom Config From Data Standalone MongoDB [It] should run successfully 
+# /home/arnob/go/src/kubedb.dev/tests/e2e/mongodb/lib.go:334
+
+# [Fail] Vertical Scaling with arbiter With Custom Config From New ConfigMap Standalone MongoDB [It] should run successfully 
+# /home/arnob/go/src/kubedb.dev/tests/e2e/mongodb/lib.go:334

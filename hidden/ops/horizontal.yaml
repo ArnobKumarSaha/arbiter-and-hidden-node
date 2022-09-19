@@ -6,13 +6,13 @@ metadata:
 spec:
   type: HorizontalScaling
   databaseRef:
-    name: sh
+    name: mongo
   horizontalScaling:
-    # replicas: 1
-    shard:
-      shards: 2
-      replicas: 2
+    replicas: 3
+    # shard:
+    #   shards: 2
+    #   replicas: 2
     hidden:
-      replicas: 2
-    configServer:
-      replicas: 2
+      replicas: 1
+    # configServer:
+    #   replicas: 2
