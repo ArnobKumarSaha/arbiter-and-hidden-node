@@ -6,8 +6,8 @@ metadata:
 spec:
   type: VolumeExpansion  
   databaseRef:
-    name: mongo
+    name: sh
   volumeExpansion:
-    replicaSet: 12Gi
+    shard: 12Gi
     hidden: 13Gi
-    mode: "Offline"
+    mode: "Online"
