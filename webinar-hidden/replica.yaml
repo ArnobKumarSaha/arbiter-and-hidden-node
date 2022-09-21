@@ -15,14 +15,7 @@ spec:
           memory: "400Mi"
   replicas: 3
   storageEngine: inMemory
-  storageType: Durable
-  storage:
-    storageClassName: "standard"
-    accessModes:
-      - ReadWriteOnce
-    resources:
-      requests:
-        storage: 1Gi
+  storageType: Ephemeral
   sslMode: requireSSL
   tls:
     issuerRef:

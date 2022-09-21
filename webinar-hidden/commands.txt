@@ -4,3 +4,7 @@ mongo --ipv6 --host localhost --tls --tlsCAFile /var/run/mongodb/tls/ca.crt --tl
 
 kubectl create secret generic -n demo connection-conf --from-file=mongod.conf=./connection-conf
 kubectl create secret generic -n demo log-conf --from-file=mongod.conf=./log-conf
+
+db._adminCommand({getCmdLineOpts: 1})
+db.colls.insertOne({"hunny": "bunny"})
+
