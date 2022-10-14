@@ -4,16 +4,16 @@ metadata:
   name: mongo
   namespace: demo
 spec:
-  version: "4.2.3" #"4.4.6"
+  version: "6.0.2"
   replicaSet:
     name: "replicaset"
   podTemplate:
     spec:
       resources:
         requests:
-          cpu: "200m"
-          memory: "200Mi"
-  replicas: 2
+          cpu: "300m"
+          memory: "300Mi"
+  replicas: 3
   # storageEngine: inMemory
   storageType: Durable
   storage:
@@ -23,7 +23,7 @@ spec:
       - ReadWriteOnce
     resources:
       requests:
-        storage: 300Mi
+        storage: 1Gi
   # sslMode: requireSSL
   # tls:
   #   issuerRef:
@@ -31,20 +31,20 @@ spec:
   #     kind: Issuer
   #     name: mongo-ca-issuer
   # clusterAuthMode: x509
-  # arbiter:
-  #   podTemplate:
-  #     spec:
-  #       resources:
-  #         requests:
-  #           cpu: "150m"
-  #           memory: "150Mi"
-  hidden:
+  arbiter:
     podTemplate:
       spec:
         resources:
           requests:
             cpu: "200m"
             memory: "200Mi"
+  hidden:
+    podTemplate:
+      spec:
+        resources:
+          requests:
+            cpu: "400m"
+            memory: "400Mi"
     replicas: 2
     storage:
       storageClassName: "standard"
@@ -53,5 +53,19 @@ spec:
         - ReadWriteOnce
       resources:
         requests:
-          storage: 400Mi
+          storage: 2Gi
+  # authSecret:
+  #   name: hello
+    # externallyManaged: true
   terminationPolicy: WipeOut
+  monitor:
+    agent: prometheus.io/operator
+    prometheus:
+      exporter:
+        port: 56790
+        resources: {}
+      serviceMonitor:
+        interval: 10s
+        labels:
+          release: prometheus
+

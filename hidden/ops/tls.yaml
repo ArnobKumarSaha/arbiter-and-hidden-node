@@ -6,9 +6,10 @@ metadata:
 spec:
   type: ReconfigureTLS
   databaseRef:
-    name: sh
+    name: sh # mongo
   tls:
     issuerRef:
       apiGroup: "cert-manager.io"
       kind: Issuer
       name: mongo-ca-issuer
+    # remove: true

@@ -4,30 +4,30 @@ metadata:
   name: sh
   namespace: demo
 spec:
-  version: "4.2.3"
+  version: "6.0.2"
   # storageEngine: inMemory
   shardTopology:
     configServer:
-      replicas: 3
+      replicas: 2
       podTemplate:
         spec:
           resources:
             requests:
-              cpu: "100m"
-              memory: "100Mi"
+              cpu: "200m"
+              memory: "200Mi"
       storage:
         resources:
           requests:
-            storage: 100Mi
+            storage: 500Mi
         storageClassName: standard
     mongos:
-      replicas: 3 #2
+      replicas: 2
       podTemplate:
         spec:
           resources:
             requests:
-              cpu: "100m"
-              memory: "100Mi"
+              cpu: "200m"
+              memory: "200Mi"
     shard:
       #   configSecret:
       #     name: custom-config
@@ -36,13 +36,13 @@ spec:
         spec:
           resources:
             requests:
-              cpu: "100m"
-              memory: "100Mi"
+              cpu: "200m"
+              memory: "200Mi"
       shards: 2
       storage:
         resources:
           requests:
-            storage: 100Mi
+            storage: 500Mi
         storageClassName: standard
   # sslMode: requireSSL
   # tls:
@@ -73,4 +73,10 @@ spec:
         - ReadWriteOnce
       resources:
         requests:
-          storage: 100Mi
+          storage: 500Mi
+
+
+# I0929 10:55:03.883219       1 restart.go:151] MongoDBOpsRequest "msg"="Processing Pod" "MongoDB"="sh" "MongoDBOpsRequest"="tls" "Namespace"="demo" "Pod"="sh-mongos-0"
+# I0929 10:55:03.883288       1 restart.go:167] MongoDBOpsRequest "msg"="Evicting Pod" "MongoDB"="sh" "MongoDBOpsRequest"="tls" "Namespace"="demo" "Pod"="sh-mongos-0"
+# I0929 10:55:03.887952       1 restart.go:170] MongoDBOpsRequest "msg"="failed to evict pod" "MongoDB"="sh" "MongoDBOpsRequest"="tls" "Namespace"="demo" "Pod"="sh-mongos-0" "error"="Cannot evict pod as it would violate the pod's disruption budget."
+# I0929 10:55:03.887966       1 parallel.go:65] MongoDBOpsRequest "msg"="Warning: Cannot evict pod as it would violate the pod's disruption budget." "MongoDB"="sh" "MongoDBOpsRequest"="tls" "Namespace"="demo" "type"="RestartMongos"

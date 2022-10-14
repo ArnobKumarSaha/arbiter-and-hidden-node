@@ -1,0 +1,155 @@
+arnob@office-pc ~> kubectl logs -n demo sh-mongos-0 -c bootstrap
+[2022-10-11T10:46:39,371851850+00:00] [mongos.sh] Ping Config Server replicaset : cnfRepSet/sh-configsvr-0.sh-configsvr-pods.demo.svc:27017,sh-configsvr-1.sh-configsvr-pods.demo.svc:27017
+{
+  ok: 1,
+  lastCommittedOpTime: Timestamp({ t: 1665485200, i: 29 }),
+  '$clusterTime': {
+    clusterTime: Timestamp({ t: 1665485200, i: 29 }),
+    signature: {
+      hash: Binary(Buffer.from("8497308ce3f7128c10c646d3ee6693f97a1939fa", "hex"), 0),
+      keyId: Long("7153201837452034072")
+    }
+  },
+  operationTime: Timestamp({ t: 1665485200, i: 29 })
+}
+[2022-10-11T10:46:40,226089338+00:00] [mongos.sh] Check if Config Server primary node is UP!!
+[2022-10-11T10:46:41,016499765+00:00] [mongos.sh] Starting a mongos instance...
+[2022-10-11T10:46:41,017653326+00:00] [mongos.sh] Waiting for mongos to be ready...
+Current Mongosh Log ID:	634549912265e6197b803574
+Connecting to:		mongodb://localhost:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+1.6.0
+Using MongoDB:		6.0.2
+Using Mongosh:		1.6.0
+
+For mongosh info see: https://docs.mongodb.com/mongodb-shell/
+
+
+To help improve our products, anonymous usage data is collected and sent to MongoDB periodically (https://www.mongodb.com/legal/privacy-policy).
+You can opt-out by running the disableTelemetry() command.
+
+{
+  ok: 1,
+  '$clusterTime': {
+    clusterTime: Timestamp({ t: 1665485201, i: 32 }),
+    signature: {
+      hash: Binary(Buffer.from("9724bdfe988609608e064dbbaf5cd899da9cccf9", "hex"), 0),
+      keyId: Long("7153201837452034072")
+    }
+  },
+  operationTime: Timestamp({ t: 1665485201, i: 32 })
+}
+[2022-10-11T10:46:41,799489323+00:00] [mongos.sh] Add shard instances
+[2022-10-11T10:46:41,800572580+00:00] [mongos.sh] Shard list 2: shard0/sh-shard0-0.sh-shard0-pods.demo.svc.cluster.local:27017,sh-shard0-1.sh-shard0-pods.demo.svc.cluster.local:27017 shard1/sh-shard1-0.sh-shard1-pods.demo.svc.cluster.local:27017,sh-shard1-1.sh-shard1-pods.demo.svc.cluster.local:27017
+[2022-10-11T10:46:41,801516109+00:00] [mongos.sh] Add shard: shard0/sh-shard0-0.sh-shard0-pods.demo.svc.cluster.local:27017,sh-shard0-1.sh-shard0-pods.demo.svc.cluster.local:27017
+Current Mongosh Log ID:	63454992ca067a5cd4dd8b2a
+Connecting to:		mongodb://<credentials>@localhost:27017/?directConnection=true&serverSelectionTimeoutMS=2000&authSource=admin&appName=mongosh+1.6.0
+Using MongoDB:		6.0.2
+Using Mongosh:		1.6.0
+
+For mongosh info see: https://docs.mongodb.com/mongodb-shell/
+
+------
+   The server generated these startup warnings when booting
+   2022-10-11T10:46:41.093+00:00: You are running this process as the root user, which is not recommended
+------
+
+{
+  shardAdded: 'shard0',
+  ok: 1,
+  '$clusterTime': {
+    clusterTime: Timestamp({ t: 1665485202, i: 31 }),
+    signature: {
+      hash: Binary(Buffer.from("60f590cd1271cdec02d60e42145e9c85e9b3d420", "hex"), 0),
+      keyId: Long("7153201837452034072")
+    }
+  },
+  operationTime: Timestamp({ t: 1665485202, i: 31 })
+}
+[2022-10-11T10:46:42,649503994+00:00] [mongos.sh] Add shard: shard1/sh-shard1-0.sh-shard1-pods.demo.svc.cluster.local:27017,sh-shard1-1.sh-shard1-pods.demo.svc.cluster.local:27017
+Current Mongosh Log ID:	63454993ddbf2ecbe467c3a0
+Connecting to:		mongodb://<credentials>@localhost:27017/?directConnection=true&serverSelectionTimeoutMS=2000&authSource=admin&appName=mongosh+1.6.0
+Using MongoDB:		6.0.2
+Using Mongosh:		1.6.0
+
+For mongosh info see: https://docs.mongodb.com/mongodb-shell/
+
+------
+   The server generated these startup warnings when booting
+   2022-10-11T10:46:41.093+00:00: You are running this process as the root user, which is not recommended
+------
+
+{
+  shardAdded: 'shard1',
+  ok: 1,
+  '$clusterTime': {
+    clusterTime: Timestamp({ t: 1665485203, i: 58 }),
+    signature: {
+      hash: Binary(Buffer.from("e06f01f8252c7d2621a18ffd67d8458ee7e3e59b", "hex"), 0),
+      keyId: Long("7153201837452034072")
+    }
+  },
+  operationTime: Timestamp({ t: 1665485203, i: 57 })
+}
+[2022-10-11T10:46:43,551872767+00:00] [mongos.sh] Ensure admin user credentials
+[2022-10-11T10:46:45,283872109+00:00] [mongos.sh] enableSharding = Current Mongosh Log ID:	63454995da93f840183f120e
+Connecting to:		mongodb://<credentials>@localhost:27017/admin?directConnection=true&serverSelectionTimeoutMS=2000&authSource=admin&appName=mongosh+1.6.0
+Using MongoDB:		6.0.2
+Using Mongosh:		1.6.0
+
+For mongosh info see: https://docs.mongodb.com/mongodb-shell/
+
+------
+   The server generated these startup warnings when booting
+   2022-10-11T10:46:41.093+00:00: You are running this process as the root user, which is not recommended
+------
+
+{
+  ok: 1,
+  '$clusterTime': {
+    clusterTime: Timestamp({ t: 1665485204, i: 31 }),
+    signature: {
+      hash: Binary(Buffer.from("b9a565ae72031331995393070797a7cc37e0e4ad", "hex"), 0),
+      keyId: Long("7153201837452034072")
+    }
+  },
+  operationTime: Timestamp({ t: 1665485204, i: 31 })
+}
+[2022-10-11T10:46:46,112280517+00:00] [mongos.sh] createIndex = Current Mongosh Log ID:63454995062e64aefd02b560
+Connecting to:		mongodb://<credentials>@localhost:27017/kubedb-system?directConnection=true&serverSelectionTimeoutMS=2000&authSource=admin&appName=mongosh+1.6.0
+Using MongoDB:		6.0.2
+Using Mongosh:		1.6.0
+
+For mongosh info see: https://docs.mongodb.com/mongodb-shell/
+
+------
+   The server generated these startup warnings when booting
+   2022-10-11T10:46:41.093+00:00: You are running this process as the root user, which is not recommended
+------
+
+id_1
+[2022-10-11T10:46:46,967873472+00:00] [mongos.sh] shardCollection = Current Mongosh Log ID:	63454996c7cecb586c0a04b8
+Connecting to:		mongodb://<credentials>@localhost:27017/?directConnection=true&serverSelectionTimeoutMS=2000&authSource=admin&appName=mongosh+1.6.0
+Using MongoDB:		6.0.2
+Using Mongosh:		1.6.0
+
+For mongosh info see: https://docs.mongodb.com/mongodb-shell/
+
+------
+   The server generated these startup warnings when booting
+   2022-10-11T10:46:41.093+00:00: You are running this process as the root user, which is not recommended
+------
+
+{
+  collectionsharded: 'kubedb-system.health-check',
+  ok: 1,
+  '$clusterTime': {
+    clusterTime: Timestamp({ t: 1665485206, i: 48 }),
+    signature: {
+      hash: Binary(Buffer.from("619583cdad02624dc2eda03cae18f3e7aa9a34fb", "hex"), 0),
+      keyId: Long("7153201837452034072")
+    }
+  },
+  operationTime: Timestamp({ t: 1665485206, i: 44 })
+}
+[2022-10-11T10:46:46,968970879+00:00] [mongos.sh] Ensure Initializing init scripts
+[2022-10-11T10:46:47,762176317+00:00] [mongos.sh] Shutting down mongos (force: true)...
+MongoNetworkError: connection 1 to 127.0.0.1:27017 closed
