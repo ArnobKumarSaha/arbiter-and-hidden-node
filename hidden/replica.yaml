@@ -4,7 +4,8 @@ metadata:
   name: mongo
   namespace: demo
 spec:
-  version: "6.0.2"
+  #version: "6.0.2"
+  version: "4.4.6"
   replicaSet:
     name: "replicaset"
   podTemplate:
@@ -13,12 +14,11 @@ spec:
         requests:
           cpu: "300m"
           memory: "300Mi"
-  replicas: 3
+  replicas: 2
   # storageEngine: inMemory
   storageType: Durable
   storage:
     storageClassName: "standard"
-    # storageClassName: linode-block-storage
     accessModes:
       - ReadWriteOnce
     resources:
@@ -31,13 +31,13 @@ spec:
   #     kind: Issuer
   #     name: mongo-ca-issuer
   # clusterAuthMode: x509
-  arbiter:
-    podTemplate:
-      spec:
-        resources:
-          requests:
-            cpu: "200m"
-            memory: "200Mi"
+  # arbiter:
+  #   podTemplate:
+  #     spec:
+  #       resources:
+  #         requests:
+  #           cpu: "200m"
+  #           memory: "200Mi"
   hidden:
     podTemplate:
       spec:
@@ -48,7 +48,6 @@ spec:
     replicas: 2
     storage:
       storageClassName: "standard"
-      # storageClassName: linode-block-storage
       accessModes:
         - ReadWriteOnce
       resources:
@@ -58,14 +57,31 @@ spec:
   #   name: hello
     # externallyManaged: true
   terminationPolicy: WipeOut
-  monitor:
-    agent: prometheus.io/operator
-    prometheus:
-      exporter:
-        port: 56790
-        resources: {}
-      serviceMonitor:
-        interval: 10s
-        labels:
-          release: prometheus
+  # monitor:
+  #   agent: prometheus.io/operator
+  #   prometheus:
+  #     serviceMonitor:
+  #       interval: 10s
+  #       labels:
+  #         release: prometheus
+  #     exporter:
+  #       args:
+  #       - --collect.database
+  #       env:
+  #       - name: ENV_VARIABLE
+  #         value: "yoo"
+  #       resources:
+  #         requests:
+  #           memory: 444Mi
+  #           cpu: 444m
+  #         limits:
+  #           memory: 444Mi
+  #           cpu: 444m
+  #       securityContext:
+  #         runAsUser: 2000
+  #         allowPrivilegeEscalation: false
+  #       port: 56790
 
+# str=0.32.0 val=0.32.0 ori=v0.32.0 meta= 
+# image=kubedb/mongodb_exporter:v0.32.0@sha256:12c0d2f8c27a9747eba06cf623cbe5b7651cc6c7c9f48a2df16002eb4cd5d762 kubedb/mongodb_exporter:v0.32.0 
+# tag=kubedb/mongodb_exporter:v0.32.0

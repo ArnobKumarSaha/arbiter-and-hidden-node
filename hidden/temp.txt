@@ -1,0 +1,5 @@
+
+Summarizing 1 Failure:
+  [INTERRUPTED] General SSL General SSL With sslMode disabled Without arbiter but with hidden node With ClusterAuthMode keyfile With Sharding Initialization - script & snapshot [It] should initialize database successfully
+  /home/arnob/go/src/kubedb.dev/tests/e2e/mongodb/general_ssl.go:1439
+

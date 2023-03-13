@@ -1,0 +1,95 @@
+apiVersion: kubedb.com/v1alpha2
+kind: MongoDB
+metadata:
+  name: mongo-sh
+  namespace: demo
+spec:
+  version: "4.2.3"
+  shardTopology:
+    configServer:
+      replicas: 2
+      podTemplate:
+        spec:
+          resources:
+            requests:
+              cpu: "300m"
+              memory: "400Mi"
+      storage:
+        resources:
+          requests:
+            storage: 500Mi
+        storageClassName: standard
+    mongos:
+      replicas: 2
+      podTemplate:
+        spec:
+          resources:
+            requests:
+              cpu: "300m"
+              memory: "400Mi"
+    shard:
+      replicas: 3
+      podTemplate:
+        spec:
+          resources:
+            requests:
+              cpu: "300m"
+              memory: "400Mi"
+      shards: 2
+      storage:
+        resources:
+          requests:
+            storage: 500Mi
+        storageClassName: standard
+  terminationPolicy: WipeOut
+  arbiter:
+    podTemplate:
+      spec:
+        resources:
+          requests:
+            cpu: "300m"
+            memory: "400Mi"
+  # hidden:
+  #   podTemplate:
+  #     spec:
+  #       resources:
+  #         requests:
+  #           cpu: "200m"
+  #           memory: "200Mi"
+  #   replicas: 1
+  #   storage:
+  #     storageClassName: "standard"
+  #     accessModes:
+  #       - ReadWriteOnce
+  #     resources:
+  #       requests:
+  #         storage: 500Mi
+---
+
+apiVersion: autoscaling.kubedb.com/v1alpha1
+kind: MongoDBAutoscaler
+metadata:
+  name: mg-autoscaler
+  namespace: demo
+spec:
+  compute:
+    shard:
+      containerControlledValues: RequestsAndLimits
+      controlledResources:
+      - cpu
+      - memory
+      podLifeTimeThreshold: 3m0s
+      resourceDiffPercentage: 5
+      trigger: "On"
+    arbiter:
+      containerControlledValues: RequestsAndLimits
+      controlledResources:
+      - cpu
+      - memory
+      podLifeTimeThreshold: 3m0s
+      resourceDiffPercentage: 5
+      trigger: "On"
+  databaseRef:
+    name: mongo-sh
+  opsRequestOptions:
+    apply: IfReady

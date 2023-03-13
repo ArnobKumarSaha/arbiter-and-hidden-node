@@ -1,0 +1,55 @@
+type PodSpec struct {
+	-Affinity *core.Affinity `json:"affinity,omitempty" protobuf:"bytes,3,opt,name=affinity"`
+
+	-Args []string `json:"args,omitempty" protobuf:"bytes,20,rep,name=args"`
+
+	-Env []core.EnvVar `json:"env,omitempty" protobuf:"bytes,21,rep,name=env"`
+
+	-ContainerSecurityContext *core.SecurityContext `json:"containerSecurityContext,omitempty" protobuf:"bytes,26,opt,name=containerSecurityContext"`
+
+    DNSPolicy core.DNSPolicy `json:"dnsPolicy,omitempty" protobuf:"bytes,15,opt,name=dnsPolicy,casttype=k8s.io/api/core/v1.DNSPolicy"`
+
+	DNSConfig *core.PodDNSConfig `json:"dnsConfig,omitempty" protobuf:"bytes,16,opt,name=dnsConfig"`
+
+    -HostNetwork bool `json:"hostNetwork,omitempty" protobuf:"varint,9,opt,name=hostNetwork"`
+
+	-HostPID bool `json:"hostPID,omitempty" protobuf:"varint,10,opt,name=hostPID"`
+
+	-HostIPC bool `json:"hostIPC,omitempty" protobuf:"varint,11,opt,name=hostIPC"`
+
+	-ImagePullSecrets []core.LocalObjectReference `json:"imagePullSecrets,omitempty" protobuf:"bytes,6,rep,name=imagePullSecrets"`
+
+	-InitContainers []core.Container `json:"initContainers,omitempty" patchStrategy:"merge" patchMergeKey:"name" protobuf:"bytes,19,rep,name=initContainers"`
+
+	-Lifecycle *core.Lifecycle `json:"lifecycle,omitempty" protobuf:"bytes,25,opt,name=lifecycle"`
+
+	-LivenessProbe *core.Probe `json:"livenessProbe,omitempty" protobuf:"bytes,23,opt,name=livenessProbe"`
+
+	-NodeSelector map[string]string `json:"nodeSelector,omitempty" protobuf:"bytes,2,rep,name=nodeSelector"`
+
+	-PriorityClassName string `json:"priorityClassName,omitempty" protobuf:"bytes,7,opt,name=priorityClassName"`
+
+	-Priority *int32 `json:"priority,omitempty" protobuf:"varint,8,opt,name=priority"`
+
+	-ReadinessProbe *core.Probe `json:"readinessProbe,omitempty" protobuf:"bytes,24,opt,name=readinessProbe"`
+
+	-Resources core.ResourceRequirements `json:"resources,omitempty" protobuf:"bytes,22,opt,name=resources"`
+
+	-ServiceAccountName string `json:"serviceAccountName,omitempty" protobuf:"bytes,1,opt,name=serviceAccountName"`
+
+	-SchedulerName string `json:"schedulerName,omitempty" protobuf:"bytes,4,opt,name=schedulerName"`
+
+	ShareProcessNamespace *bool `json:"shareProcessNamespace,omitempty" protobuf:"varint,12,opt,name=shareProcessNamespace"`
+
+	-SecurityContext *core.PodSecurityContext `json:"securityContext,omitempty" protobuf:"bytes,13,opt,name=securityContext"`
+
+	TerminationGracePeriodSeconds *int64 `json:"terminationGracePeriodSeconds,omitempty" protobuf:"varint,14,opt,name=terminationGracePeriodSeconds"`
+
+	-Tolerations []core.Toleration `json:"tolerations,omitempty" protobuf:"bytes,5,rep,name=tolerations"`
+
+	TopologySpreadConstraints []core.TopologySpreadConstraint `json:"topologySpreadConstraints,omitempty" patchStrategy:"merge" patchMergeKey:"topologyKey" protobuf:"bytes,17,rep,name=topologySpreadConstraints"`
+
+	-VolumeMounts []core.VolumeMount `json:"volumeMounts,omitempty" patchStrategy:"merge" patchMergeKey:"mountPath" protobuf:"bytes,27,rep,name=volumeMounts"`
+
+	-Volumes []core.Volume `json:"volumes,omitempty" patchStrategy:"merge,retainKeys" patchMergeKey:"name" protobuf:"bytes,18,rep,name=volumes"`
+}
